@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import math
 
-def spiralData(numSamples, noise):
+def spiralData(numSamples, noise, seed):
+    np.random.seed(seed)
     points = []
     n = numSamples / 2
 
@@ -14,15 +15,16 @@ def spiralData(numSamples, noise):
             y = r * math.cos(t) + np.random.uniform(-1, 1) * noise
             points.append({'x': x, 'y': y, 'label': label})
 
-    genSpiral(0, 1)
-    genSpiral(math.pi, -1)
+    genSpiral(0, 0)
+    genSpiral(math.pi, 1)
     return pd.DataFrame(points)
 
-def xorData(numSamples, noise):
+def xorData(numSamples, noise, seed):
+    np.random.seed(seed)
     points = [];
 
     def getXORLabel(p):
-        return 1 if (p['x'] * p['y'] >= 0) else -1
+        return 0 if (p['x'] * p['y'] >= 0) else 1
 
     for i in xrange(numSamples):
         padding = 0.3
@@ -36,7 +38,8 @@ def xorData(numSamples, noise):
 
     return pd.DataFrame(points)
 
-def circleData(numSamples, noise):
+def circleData(numSamples, noise, seed):
+    np.random.seed(seed)
     points = [];
     radius = 5;
     n = numSamples / 2
@@ -48,7 +51,7 @@ def circleData(numSamples, noise):
         return math.sqrt(dx * dx + dy * dy)
 
     def getCircleLabel(p, center):
-        return 1 if (dist(p, center) < (radius * 0.5)) else -1;
+        return 0 if (dist(p, center) < (radius * 0.5)) else 1;
 
     def genCicle(rMin, rMax):
         for i  in xrange(n):
@@ -68,7 +71,8 @@ def circleData(numSamples, noise):
 
     return pd.DataFrame(points)
 
-def gaussianData(numSamples, noise):
+def gaussianData(numSamples, noise, seed):
+    np.random.seed(seed)
     points = [];
     variance = 0.5 + noise * 7
     n = numSamples / 2
@@ -80,20 +84,30 @@ def gaussianData(numSamples, noise):
             points.append({'x': x, 'y': y, 'label': label})
 
 
-    genGauss(2, 2, 1)
-    genGauss(-2, -2, -1)
+    genGauss(2, 2, 0)
+    genGauss(-2, -2, 1)
 
     return pd.DataFrame(points)
 
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
     from sklearn.cross_validation import train_test_split
 
-    data = spiralData(500, 0.1)
-    train, test = train_test_split(data, test_size = 0.5)
+    data = spiralData(500, 0.1, 100)
+    # print data.x.sum(), data.y.sum()
+    # print sum(data.x), sum(data.y), sum(data.label)
+    # print data.mean
+    train, test = train_test_split(data, test_size = 0.5, random_state=100)
+    bla = train.as_matrix(['label'])
+    # print bla
+    # print bla[0]
+    print train.label
+    print train.label[0]
+    # print train.x.sum(), train.y.sum()
+    # print test.x.sum(), test.y.sum()
 
-    train.plot(kind='scatter', x='x', y='y', c='label')
-    test.plot(kind='scatter', x='x', y='y', c='label')
-    plt.show()
+    # train.plot(kind='scatter', x='x', y='y', c='label')
+    # test.plot(kind='scatter', x='x', y='y', c='label')
+    # plt.show()
 
 
