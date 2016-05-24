@@ -134,7 +134,7 @@ def runExperiment(architecture, dataset, seed):
                 max_evaluations=900, num_samples=1000, batch_size=60)
     else:
         learned_params = trainNetwork(dataset, 2, buildNet, f, seed,
-                max_evaluations=140, num_samples=250, batch_size=10)
+                max_evaluations=60, num_samples=250, batch_size=30)
 
     f.close()
 
