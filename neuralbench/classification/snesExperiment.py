@@ -130,11 +130,11 @@ def runExperiment(architecture, dataset, seed):
     f = open(file_name, 'w')
     buildNet = createArchitecture(architecture, dataset["name"])
     if dataset["name"] == "mnist":
-        learned_params = trainNetwork(dataset, 2, buildNet, f, seed,
+        learned_params = trainNetwork(dataset, 10, buildNet, f, seed,
                 max_evaluations=900, num_samples=1000, batch_size=60)
     else:
         learned_params = trainNetwork(dataset, 2, buildNet, f, seed,
-                max_evaluations=900, num_samples=50, batch_size=10)
+                max_evaluations=140, num_samples=250, batch_size=10)
 
     f.close()
 
