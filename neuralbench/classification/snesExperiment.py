@@ -71,8 +71,6 @@ def testNetwork(data, n_classes, params, buildNet, evals, file, seed):
     # dataset, architecture, seed, evals, acc
     file.write("snes %d %d %f\n" % (seed, evals, acc))
 
-    
-
 def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations=1000, num_samples=50, batch_size=20):
     # The training functions uses the average of the cumulated reward and maximum height as fitness
     X_train = data["X_train"]
@@ -83,7 +81,10 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations=1000, nu
         nn = buildNet(X_train.shape[1], n_classes)
         nn._setParameters(np.array(params))
 
-        sampled_data = np.random.choice(len(X_train), num_samples)
+        random_state = np.random.get_state()
+        np.random.seed(l.numLearningSteps)
+        sampled_data = np.random.choice(len(X_train), num_samples, replace=False)
+        np.random.set_state(random_state)
         cur_data = X_train[sampled_data]
         cur_label = y_train[sampled_data]
 
@@ -116,13 +117,12 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations=1000, nu
     l.minimize = True
 
     for i in xrange((max_evaluations/batch_size)):
-        result = l.learn(additionalLearningSteps=5)
+        result = l.learn(additionalLearningSteps=1)
         learned = result[0]
 
         testNetwork(data, n_classes, learned, buildNet, num_samples * (i + 1) * batch_size, file, seed)
 
     return learned
-
 
 def runExperiment(architecture, dataset, seed):
     np.random.seed(seed)
@@ -134,10 +134,9 @@ def runExperiment(architecture, dataset, seed):
                 max_evaluations=900, num_samples=1000, batch_size=60)
     else:
         learned_params = trainNetwork(dataset, 2, buildNet, f, seed,
-                max_evaluations=60, num_samples=250, batch_size=30)
+                max_evaluations=10*720, num_samples=250/10, batch_size=30)
 
     f.close()
-
 
 
 
