@@ -71,8 +71,8 @@ if __name__ == '__main__':
     data = {"X_train": X_train, "y_train": y_train, "X_test": X_test , "y_test": y_test, "name": args.dataset}
 
     if args.algorithm == "neat":
-        # TODO
-        pass
+        import neatExperiment
+        neatExperiment.runExperiment(data, args.seed)
     elif args.algorithm == "snes":
         import snesExperiment
         snesExperiment.runExperiment(args.architecture, data, args.seed)
