@@ -139,7 +139,7 @@ def trainNetwork(data, n_classes, file, seed, max_evaluations, num_samples, batc
 
 def runExperiment(dataset, seed, max_evaluations, num_samples):
     np.random.seed(seed)
-    file_name = "neat_neat_%s_%03d_e%06d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
+    file_name = "neat_neat_%s_%03d_e%06d_s%05d.dat" % (dataset["name"], seed, max_evaluations, num_samples)
     f = open(file_name, 'w')
     if dataset["name"] == "mnist":
         trainNetwork(dataset, 10, f, seed,
