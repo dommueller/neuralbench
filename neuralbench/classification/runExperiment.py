@@ -64,9 +64,9 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--samples", help="number of samples per evaluation", type=int, default=50)
     args = parser.parse_args()
     if args.architecture:
-        print "Training on %s using %s and %s, the seed is %d (Using %d samples for %d)" % (args.dataset, args.algorithm, args.architecture, args.seed, args.samples, args.evaluations)
+        print "Training on %s using %s and %s, the seed is %d (Using %d samples for %d evaluations)" % (args.dataset, args.algorithm, args.architecture, args.seed, args.samples, args.evaluations)
     else:
-        print "Training on %s using %s and seed is %d (Using %d samples)" % (args.dataset, args.algorithm, args.seed, args.samples, args.evaluations)
+        print "Training on %s using %s and seed is %d (Using %d samples for %d evaluations)" % (args.dataset, args.algorithm, args.seed, args.samples, args.evaluations)
 
     X_train, y_train, X_test, y_test = createDataSet(args.dataset, args.seed)
     data = {"X_train": X_train, "y_train": y_train, "X_test": X_test , "y_test": y_test, "name": args.dataset}
