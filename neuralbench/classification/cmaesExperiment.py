@@ -1,7 +1,7 @@
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.structure.modules import TanhLayer
 from pybrain.structure import SoftmaxLayer
-from pybrain.optimization import SNES
+from pybrain.optimization import CMAES
 
 from sklearn.metrics import confusion_matrix
 import numpy as np
@@ -69,7 +69,7 @@ def testNetwork(data, n_classes, params, buildNet, evals, file, seed):
 
     acc =  corr/float(len(predictions))
     # dataset, architecture, seed, evals, acc
-    file.write("snes %d %d %f\n" % (seed, evals, acc))
+    file.write("cmaes %d %d %f\n" % (seed, evals, acc))
 
 def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_samples):
     # The training functions uses the average of the cumulated reward and maximum height as fitness
@@ -110,9 +110,9 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
 
     testNetwork(data, n_classes, learned, buildNet, 0, file, seed)
 
-    l = SNES(objF, learned, verbose=False)
-    # l.batchSize = batch_size
+    l = CMAES(objF, learned, verbose=False)
     batch_size = l.batchSize
+    # l._setBatchSize = batch_size
     l.maxEvaluations = max_evaluations
     l.minimize = True
 
@@ -126,7 +126,7 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
 
 def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
     np.random.seed(seed)
-    file_name = "snes_%s_%s_%03d_e%06d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
+    file_name = "cmaes_%s_%s_%03d_e%06d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
     f = open(file_name, 'w')
     buildNet = createArchitecture(architecture, dataset["name"])
     if dataset["name"] == "mnist":

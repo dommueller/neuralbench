@@ -1,11 +1,10 @@
 #!/usr/bin/python
 
-import tsPlaygroundDatasets
-from sklearn.cross_validation import train_test_split
 import argparse
-import numpy as np
 
 def createDataSet(choice, seed):
+    import tsPlaygroundDatasets
+    from sklearn.cross_validation import train_test_split
     if choice == "spiral":
         data = tsPlaygroundDatasets.spiralData(500, 0.25, seed)
         train, test = train_test_split(data, test_size = 0.5, random_state=seed)
@@ -52,7 +51,7 @@ def createDataSet(choice, seed):
 
 
 if __name__ == '__main__':
-    algorithms = ["neat", "snes", "backprop", "cosyne"]
+    algorithms = ["neat","hyperneat", "snes", "cmaes", "backprop", "cosyne"]
     datasets = ["spiral", "xor", "circle", "gaussian", "mnist"]
     architectures = ["perceptron", "small", "big", "deep"]
 
@@ -61,21 +60,29 @@ if __name__ == '__main__':
     parser.add_argument("dataset", help="the dataset that should be used", choices=datasets)
     parser.add_argument("seed", help="the seed that should be used", type=int)
     parser.add_argument("-a", "--architecture", help="the architecture that should be used if not neat", choices=architectures)
+    parser.add_argument("-e", "--evaluations", help="max number of evaluations", type=int, default=10000)
+    parser.add_argument("-s", "--samples", help="number of samples per evaluation", type=int, default=50)
     args = parser.parse_args()
     if args.architecture:
-        print "Training on %s using %s and %s, the seed is %d" % (args.dataset, args.algorithm, args.architecture, args.seed)
+        print "Training on %s using %s and %s, the seed is %d (Using %d samples for %d)" % (args.dataset, args.algorithm, args.architecture, args.seed, args.samples, args.evaluations)
     else:
-        print "Training on %s using %s and seed is %d" % (args.dataset, args.algorithm, args.seed)
+        print "Training on %s using %s and seed is %d (Using %d samples)" % (args.dataset, args.algorithm, args.seed, args.samples, args.evaluations)
 
     X_train, y_train, X_test, y_test = createDataSet(args.dataset, args.seed)
     data = {"X_train": X_train, "y_train": y_train, "X_test": X_test , "y_test": y_test, "name": args.dataset}
 
     if args.algorithm == "neat":
         import neatExperiment
-        neatExperiment.runExperiment(data, args.seed)
+        neatExperiment.runExperiment(data, args.seed, args.evaluations, args.samples)
+    elif args.algorithm == "hyperneat":
+        import hyperNeatExperiment
+        hyperNeatExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "snes":
         import snesExperiment
-        snesExperiment.runExperiment(args.architecture, data, args.seed)
+        snesExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
+    elif args.algorithm == "cmaes":
+        import cmaesExperiment
+        cmaesExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "backprop":
         # TODO
         pass
@@ -83,6 +90,6 @@ if __name__ == '__main__':
         # Not implemented yet
         pass
     else:
-        print "Bad luck something went wrong"
+        print "Algorithm not found"
 
 

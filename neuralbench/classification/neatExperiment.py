@@ -82,7 +82,7 @@ def softmax(w, t = 1.0):
     dist = e / np.sum(e)
     return dist
 
-def trainNetwork(data, n_classes, file, seed, max_evaluations=1000, num_samples=50, batch_size=150):
+def trainNetwork(data, n_classes, file, seed, max_evaluations, num_samples, batch_size=150):
     params.PopulationSize = batch_size
     X_train = data["X_train"]
     y_train = data["y_train"]
@@ -111,7 +111,6 @@ def trainNetwork(data, n_classes, file, seed, max_evaluations=1000, num_samples=
             for q, out in enumerate(result):
                 if q != cor:
                     loss_sum += max(0, out - result[int(cor)] + 1)
-            # guess = np.argmax(result)
             # Could also train with all results (e.g. l2 or logloss)
             #if guess == cor:
                 #cum_correct += 1
@@ -123,6 +122,7 @@ def trainNetwork(data, n_classes, file, seed, max_evaluations=1000, num_samples=
     g = NEAT.Genome(0, X_train.shape[1], 0, n_classes, False, 
                     NEAT.ActivationFunction.LINEAR, NEAT.ActivationFunction.TANH, 0, params)
     pop = NEAT.Population(g, params, True, 1.0, seed)
+    pop.RNG.Seed(seed)
 
     current_best = None
     for generation in range((max_evaluations/batch_size)):
@@ -131,24 +131,22 @@ def trainNetwork(data, n_classes, file, seed, max_evaluations=1000, num_samples=
 
             genome.SetFitness(reward)
 
-        # print('Generation: {}, max fitness: {}'.format(generation,
-                            # max((x.GetFitness() for x in NEAT.GetGenomeList(pop)))))
         current_best = pickle.dumps(pop.GetBestGenome())
         testNetwork(data, n_classes, current_best, num_samples * (generation + 1) * batch_size, file, seed)
         pop.Epoch()
 
 
 
-def runExperiment(dataset, seed):
+def runExperiment(dataset, seed, max_evaluations, num_samples):
     np.random.seed(seed)
-    file_name = "neat_neat_%s_%03d.dat" % (dataset["name"], seed)
+    file_name = "neat_neat_%s_%03d_e%06d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
     f = open(file_name, 'w')
     if dataset["name"] == "mnist":
         trainNetwork(dataset, 10, f, seed,
-                max_evaluations=900, num_samples=1000)
+                max_evaluations=max_evaluations, num_samples=num_samples, batch_size=150)
     else:
         trainNetwork(dataset, 2, f, seed,
-                max_evaluations=10*720, num_samples=250/10)
+                max_evaluations=max_evaluations, num_samples=num_samples, batch_size=150)
 
     f.close()
 
