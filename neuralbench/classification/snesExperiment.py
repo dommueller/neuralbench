@@ -126,7 +126,7 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
 
 def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
     np.random.seed(seed)
-    file_name = "snes_%s_%s_%03d_e%06d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
+    file_name = "snes_%s_%s_%03d_e%10d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
     f = open(file_name, 'w')
     buildNet = createArchitecture(architecture, dataset["name"])
     if dataset["name"] == "mnist":
