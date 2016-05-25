@@ -214,7 +214,7 @@ def trainNetwork(data, n_classes, subs, file, seed, max_evaluations, num_samples
 
 def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
     np.random.seed(seed)
-    file_name = "hyperneat_%s_%s_%03d_e%10d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
+    file_name = "hyperneat_%s_%s_%03d_e%010d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
     f = open(file_name, 'w')
     subs = createArchitecture(architecture, dataset["name"])
     if dataset["name"] == "mnist":
