@@ -84,8 +84,8 @@ if __name__ == '__main__':
         import cmaesExperiment
         cmaesExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "backprop":
-        # TODO
-        pass
+        import backpropExperiment
+        backpropExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "cosyne":
         # Not implemented yet
         pass
