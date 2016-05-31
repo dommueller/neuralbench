@@ -87,8 +87,8 @@ if __name__ == '__main__':
         import backpropExperiment
         backpropExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "cosyne":
-        # Not implemented yet
-        pass
+        import cosyneExperiment
+        cosyneExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     else:
         print "Algorithm not found"
 
