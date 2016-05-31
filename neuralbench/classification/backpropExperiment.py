@@ -113,7 +113,7 @@ def buildNet_deep_mnist(x, n_input, n_classes):
     out_layer = tf.matmul(layer_3, weights['out']) + biases['out']
     return tf.nn.softmax(out_layer)
 
-def buildNet_big(x, n_input_mnist, n_classes):
+def buildNet_big_mnist(x, n_input, n_classes):
 
     n_hidden_1 = 400
 
@@ -132,7 +132,7 @@ def buildNet_big(x, n_input_mnist, n_classes):
     out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
     return tf.nn.softmax(out_layer)
 
-def buildNet_small(x, n_input_mnist, n_classes):
+def buildNet_small_mnist(x, n_input, n_classes):
 
     n_hidden_1 = 80
 
@@ -221,17 +221,24 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
         testNetwork(pred, x, y, data, n_classes, 0 , file, seed)
 
         # Training cycle
-        epochs = max_evaluations / data["X_train"].shape[0]
+        epochs = num_samples * max_evaluations / data["X_train"].shape[0]
+        batches = data["X_train"].shape[0] / num_samples
 
         for epoch in xrange(epochs):
-            for i in xrange(data["X_train"].shape[0] / num_samples):
+            # Shuffle data, so each epoch different samples are in one batch
+            sampled_data = np.random.choice(len(X_train), len(X_train), replace=False)
+            shuffled_data = X_train[sampled_data]
+            shuffled_label = y_train[sampled_data]
+
+            for i in xrange(batches):
                 index = i * num_samples
                 next_index = (i + 1) * num_samples
-                cur_data = X_train[index:next_index]
-                cur_label = y_train[index:next_index]
+                cur_data = shuffled_data[index:next_index]
+                cur_label = shuffled_label[index:next_index]
 
                 _, c = sess.run([optimizer, cost], feed_dict={x: cur_data, y: cur_label})
-                testNetwork(pred, x, y, data, n_classes, epoch * data["X_train"].shape[0] + (i + 1) * num_samples , file, seed)
+
+            testNetwork(pred, x, y, data, n_classes, (epoch + 1) * batches * num_samples, file, seed)
             file.flush()
 
 
