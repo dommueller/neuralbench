@@ -115,8 +115,7 @@ def trainNetwork(data, n_classes, buildNet, num_network_weights, file, seed, max
         # print "Min", np.argmin(results)
         acc, _ = eval_genotype(buildNet, pop[np.argmin(results)], X_test, y_test)
         evals = (i + 1) * num_samples * batch_size
-        file.write("snes %d %d %f\n" % (seed, evals, acc))
-        print "snes %d %d %f" % (seed, evals, acc)
+        file.write("cosyne %d %d %f\n" % (seed, evals, acc))
         # Sort population by cost
         sort_idx = np.argsort(results)
         sorted_pop = pop[sort_idx]
