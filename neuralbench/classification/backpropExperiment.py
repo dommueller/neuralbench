@@ -44,7 +44,7 @@ def buildNet_deep(x, n_input, n_classes):
     layer_4 = tf.nn.tanh(layer_4)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_4, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def buildNet_big(x, n_input, n_classes):
 
@@ -63,7 +63,7 @@ def buildNet_big(x, n_input, n_classes):
     layer_1 = tf.nn.tanh(layer_1)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def buildNet_small(x, n_input, n_classes):
 
@@ -82,7 +82,7 @@ def buildNet_small(x, n_input, n_classes):
     layer_1 = tf.nn.tanh(layer_1)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def buildNet_deep_mnist(x, n_input, n_classes):
 
@@ -111,7 +111,7 @@ def buildNet_deep_mnist(x, n_input, n_classes):
     layer_3 = tf.nn.tanh(layer_3)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_3, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def buildNet_big_mnist(x, n_input, n_classes):
 
@@ -130,7 +130,7 @@ def buildNet_big_mnist(x, n_input, n_classes):
     layer_1 = tf.nn.tanh(layer_1)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def buildNet_small_mnist(x, n_input, n_classes):
 
@@ -149,7 +149,7 @@ def buildNet_small_mnist(x, n_input, n_classes):
     layer_1 = tf.nn.tanh(layer_1)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def buildNet_perceptron(x, n_input, n_classes):
 
@@ -162,7 +162,7 @@ def buildNet_perceptron(x, n_input, n_classes):
 
     # Output layer with linear activation
     out_layer = tf.matmul(x, weights['out']) + biases['out']
-    return tf.nn.softmax(out_layer)
+    return out_layer
 
 def createArchitecture(choice, dataset_name):
     if choice == "perceptron":
