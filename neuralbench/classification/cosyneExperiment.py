@@ -73,28 +73,6 @@ def createNewPop(old_pop, results):
     return new_pop
 
 
-def eval_genotype(buildNet, genotype, cur_data, cur_label):
-    "Takes a genotype, builds the genotype and evaluates it on the given data"
-
-    y = tf.placeholder(tf.float64, [None, cur_label.shape[1]])
-    x = tf.placeholder(tf.float64, [None, cur_data.shape[1]])
-
-    pred = buildNet(x, genotype)
-
-    # Define loss and accuracy
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
-    correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-
-    # Initializing the variables
-    init = tf.initialize_all_variables()
-    with tf.Session() as sess:
-        sess.run(init)
-
-        c = sess.run(cost, feed_dict={x: cur_data, y: cur_label})
-        acc = accuracy.eval({x: cur_data, y: cur_label})
-        return acc, c
-
 def trainNetwork(data, n_classes, buildNet, num_network_weights, file, seed, max_evaluations, num_samples):
     X_train = data["X_train"]
     y_train = dense_to_one_hot(data["y_train"], n_classes)
@@ -104,29 +82,29 @@ def trainNetwork(data, n_classes, buildNet, num_network_weights, file, seed, max
     batch_size = 40
     pop = initialize_population(num_network_weights, batch_size, 1)
 
-    for i in xrange((max_evaluations/batch_size)):
-    # for i in xrange(10):
-        sampled_data = np.random.choice(len(X_train), num_samples, replace=False)
-        cur_data = X_train[sampled_data]
-        cur_label = y_train[sampled_data]
+    eval_genotype = buildNet(X_train.shape[1], y_train.shape[1])
+    init = tf.initialize_all_variables()
+    with tf.Session() as sess:
+        sess.run(init)
 
-        results = np.array([cost for _, cost in [eval_genotype(buildNet, pheno, cur_data, cur_label) for pheno in pop]])
-        # print "Results", results
-        # print "Min", np.argmin(results)
-        acc, _ = eval_genotype(buildNet, pop[np.argmin(results)], X_test, y_test)
-        evals = (i + 1) * num_samples * batch_size
-        file.write("cosyne %d %d %f\n" % (seed, evals, acc))
-        # Sort population by cost
-        sort_idx = np.argsort(results)
-        sorted_pop = pop[sort_idx]
-        sorted_results = results[sort_idx]
+        for i in xrange((max_evaluations/batch_size)):
+        # for i in xrange(1):
+            sampled_data = np.random.choice(len(X_train), num_samples, replace=False)
+            cur_data = X_train[sampled_data]
+            cur_label = y_train[sampled_data]
 
-        # print "Population"
-        # print sorted_pop
-        pop = createNewPop(sorted_pop, sorted_results)
-        # print pop
+            results = np.array([cost for _, cost in [eval_genotype(sess, pheno, cur_data, cur_label) for pheno in pop]])
+            # print "Results", results
+            # print "Min", np.argmin(results)
+            acc, _ = eval_genotype(sess, pop[np.argmin(results)], X_test, y_test)
+            evals = (i + 1) * num_samples * batch_size
+            file.write("cosyne %d %d %f\n" % (seed, evals, acc))
+            # Sort population by cost
+            sort_idx = np.argsort(results)
+            sorted_pop = pop[sort_idx]
+            sorted_results = results[sort_idx]
 
-        # create new 
+            pop = createNewPop(sorted_pop, sorted_results)
 
 
 def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
