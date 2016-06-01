@@ -30,7 +30,7 @@ def createDataSet(choice, seed):
         y_test = test.as_matrix(['label'])
         return (X_train, y_train, X_test, y_test)
     elif choice == "gaussian":
-        data = tsPlaygroundDatasets.circleData(500, 0.0, seed)
+        data = tsPlaygroundDatasets.gaussianData(500, 0.1, seed)
         train, test = train_test_split(data, test_size = 0.5, random_state=seed)
         X_train = train.as_matrix(['x', 'y'])
         y_train = train.as_matrix(['label'])
