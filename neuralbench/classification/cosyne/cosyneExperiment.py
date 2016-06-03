@@ -203,6 +203,7 @@ def configure_for_training(params, max_evaluations, n_classes, eval_genotype, nu
 
 if __name__ == '__main__':
     print "Starting parameter sweep for cosyne"
+    import sys
     from tqdm import *
     from neuralbench.classification.dataset.create import createDataSet, run_test_validate_splits
     seed = 0
@@ -215,7 +216,7 @@ if __name__ == '__main__':
             X_train, y_train, X_test, y_test = createDataSet(dataset_name)
             buildNet, num_network_weights = cosyneNetworks.createArchitecture(architecture, dataset_name)
             eval_genotype = buildNet(2, 2)
-            file_identifier = "params_cosyne_%s_%s_%03d" % (architecture, dataset_name, seed)
+            file_identifier = str(sys.argv[0]) + "/params_cosyne_%s_%s_%03d" % (architecture, dataset_name, seed)
             for population_size in tqdm([10, 40, 100, 1000]):
                 for mutation_power in [0.01, 0.03, 0.07, 0.1, 0.3, 0.7, 1.]:
                     for mutation_rate in [0.01, 0.05, 0.1, 0.25, 0.5, 0.75]:
