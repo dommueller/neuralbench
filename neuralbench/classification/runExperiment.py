@@ -1,54 +1,7 @@
 #!/usr/bin/python
 
 import argparse
-
-def createDataSet(choice, seed):
-    import tsPlaygroundDatasets
-    from sklearn.cross_validation import train_test_split
-    if choice == "spiral":
-        data = tsPlaygroundDatasets.spiralData(500, 0.25, seed)
-        train, test = train_test_split(data, test_size = 0.5, random_state=seed)
-        X_train = train.as_matrix(['x', 'y'])
-        y_train = train.as_matrix(['label'])
-        X_test = test.as_matrix(['x', 'y'])
-        y_test = test.as_matrix(['label'])
-        return (X_train, y_train, X_test, y_test)
-    elif choice == "xor":
-        data = tsPlaygroundDatasets.xorData(500, 0.0, seed)
-        train, test = train_test_split(data, test_size = 0.5, random_state=seed)
-        X_train = train.as_matrix(['x', 'y'])
-        y_train = train.as_matrix(['label'])
-        X_test = test.as_matrix(['x', 'y'])
-        y_test = test.as_matrix(['label'])
-        return (X_train, y_train, X_test, y_test)
-    elif choice == "circle":
-        data = tsPlaygroundDatasets.circleData(500, 0.0, seed)
-        train, test = train_test_split(data, test_size = 0.5, random_state=seed)
-        X_train = train.as_matrix(['x', 'y'])
-        y_train = train.as_matrix(['label'])
-        X_test = test.as_matrix(['x', 'y'])
-        y_test = test.as_matrix(['label'])
-        return (X_train, y_train, X_test, y_test)
-    elif choice == "gaussian":
-        data = tsPlaygroundDatasets.gaussianData(500, 0.1, seed)
-        train, test = train_test_split(data, test_size = 0.5, random_state=seed)
-        X_train = train.as_matrix(['x', 'y'])
-        y_train = train.as_matrix(['label'])
-        X_test = test.as_matrix(['x', 'y'])
-        y_test = test.as_matrix(['label'])
-        return (X_train, y_train, X_test, y_test)
-    elif choice == "mnist":
-        from sklearn.datasets import fetch_mldata
-        mnist = fetch_mldata('MNIST original')
-        # rescale the data, use the traditional train/test split
-        X, y = mnist.data / 255., mnist.target
-        test_size = 60000
-        X_train, X_test = X[:test_size], X[60000:]
-        y_train, y_test = y[:test_size], y[60000:]
-        return (X_train, y_train, X_test, y_test)
-    else:
-        print "Bad luck no known dataset"
-
+from dataset.create import createDataSet
 
 if __name__ == '__main__':
     algorithms = ["neat","hyperneat", "snes", "cmaes", "backprop", "cosyne"]

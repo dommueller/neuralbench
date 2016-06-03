@@ -92,17 +92,31 @@ def gaussianData(numSamples, noise, seed):
 if __name__ == '__main__':
     # import matplotlib.pyplot as plt
     from sklearn.cross_validation import train_test_split
+    from sklearn.cross_validation import StratifiedKFold
 
     data = spiralData(500, 0.1, 100)
     # print data.x.sum(), data.y.sum()
     # print sum(data.x), sum(data.y), sum(data.label)
     # print data.mean
-    train, test = train_test_split(data, test_size = 0.5, random_state=100)
-    bla = train.as_matrix(['label'])
-    # print bla
+    # train, test = train_test_split(data, test_size = 0.5, random_state=2)
+    # bla = train.as_matrix(['label'])
+    # print len(bla)
+    # print sum(bla)
+    # labels = data.as_matrix(['label'])
+    # print len(labels)
+    # print data.label
+
+
+    skf = StratifiedKFold(data.label, n_folds=10, shuffle=True, random_state=10)
+    for train_index, test_index in skf:
+        print test_index
+        print len(data.label[test_index])
+        print sum(data.label[test_index])
+        print data.iloc[test_index]
+        break
     # print bla[0]
-    print train.label
-    print train.label[0]
+    # print train.label.
+    # print train.label[0]
     # print train.x.sum(), train.y.sum()
     # print test.x.sum(), test.y.sum()
 

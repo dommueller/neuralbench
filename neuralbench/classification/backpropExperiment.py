@@ -4,12 +4,14 @@ import tensorflow as tf
 # Taken from 
 # https://github.com/tensorflow/tensorflow/blob/1d76583411038767f673a0c96174c80eaf9ff42f/tensorflow/g3doc/tutorials/mnist/input_data.py
 def dense_to_one_hot(labels_dense, num_classes=10):
-  """Convert class labels from scalars to one-hot vectors."""
-  num_labels = labels_dense.shape[0]
-  index_offset = np.arange(num_labels) * num_classes
-  labels_one_hot = np.zeros((num_labels, num_classes))
-  labels_one_hot.flat[index_offset + labels_dense.ravel()] = 1
-  return labels_one_hot
+    """Convert class labels from scalars to one-hot vectors."""
+    labels_dense = np.array(labels_dense, dtype="int32")
+    num_labels = labels_dense.shape[0]
+    print num_labels
+    index_offset = np.arange(num_labels) * num_classes
+    labels_one_hot = np.zeros((num_labels, num_classes))
+    labels_one_hot.flat[index_offset + labels_dense.ravel()] = 1
+    return labels_one_hot
 
 
 def buildNet_deep(x, n_input, n_classes):
@@ -185,13 +187,11 @@ def createArchitecture(choice, dataset_name):
     else:
         print "Bad luck no known architecture"
 
-def testNetwork(pred, x, y, data, n_classes, evals, file, seed):
-    y_test = dense_to_one_hot(data["y_test"], n_classes)
-
+def testNetwork(pred, x, y, X_test, y_test, n_classes, evals, file, seed):
     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    acc = accuracy.eval({x: data["X_test"], y: y_test})
+    acc = accuracy.eval({x: X_test, y: y_test})
     file.write("backprop %d %d %f\n" % (seed, evals, acc))
 
 
@@ -201,8 +201,8 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
 
     X_train = data["X_train"]
     y_train = dense_to_one_hot(data["y_train"], n_classes)
-    # X_test = data["X_test"]
-    # y_test = dense_to_one_hot(data["y_test"], n_classes)
+    X_test = data["X_test"]
+    y_test = dense_to_one_hot(data["y_test"], n_classes)
 
     y = tf.placeholder("float", [None, n_classes])
     x = tf.placeholder("float", [None, X_train.shape[1]])
@@ -211,14 +211,14 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
 
     # Define loss and optimizer
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
-    optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
     # Initializing the variables
     init = tf.initialize_all_variables()
     with tf.Session() as sess:
         sess.run(init)
 
-        testNetwork(pred, x, y, data, n_classes, 0 , file, seed)
+        testNetwork(pred, x, y, X_test, y_test, n_classes, 0 , file, seed)
 
         # Training cycle
         epochs = num_samples * max_evaluations / data["X_train"].shape[0]
@@ -238,7 +238,7 @@ def trainNetwork(data, n_classes, buildNet, file, seed, max_evaluations, num_sam
 
                 _, c = sess.run([optimizer, cost], feed_dict={x: cur_data, y: cur_label})
 
-            testNetwork(pred, x, y, data, n_classes, (epoch + 1) * batches * num_samples, file, seed)
+            testNetwork(pred, x, y, X_test, y_test, n_classes, (epoch + 1) * batches * num_samples, file, seed)
             file.flush()
 
 

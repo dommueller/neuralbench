@@ -1,5 +1,6 @@
 import itertools
-import tensorflow as tf
+import tensorflow as tf    
+
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
