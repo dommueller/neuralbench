@@ -62,7 +62,7 @@ class CosyneParams(object):
         self._initial_weight_range = value
 
     def __str__(self):
-        return "%d %0.2f %0.2f %0.1f %d %0.1f" % (self.population_size, self.mutation_power, self.mutation_rate,
+        return "%d\t%0.2f\t%0.2f\t%0.1f\t%d\t%0.1f" % (self.population_size, self.mutation_power, self.mutation_rate,
                     self.selection_proportion, self.batch_size, self.initial_weight_range)
 
 
