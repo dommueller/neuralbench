@@ -35,19 +35,19 @@ params = NEAT.Parameters()
 # params.MaxActivationA  = 4.9
 
 params.ActivationFunction_SignedSigmoid_Prob = 1.0
-params.ActivationFunction_UnsignedSigmoid_Prob = 1.0
+params.ActivationFunction_UnsignedSigmoid_Prob = 0.0
 params.ActivationFunction_Tanh_Prob = 1.0
-params.ActivationFunction_TanhCubic_Prob = 1.0
+params.ActivationFunction_TanhCubic_Prob = 0.0
 params.ActivationFunction_SignedStep_Prob = 1.0
-params.ActivationFunction_UnsignedStep_Prob = 1.0
+params.ActivationFunction_UnsignedStep_Prob = 0.0
 params.ActivationFunction_SignedGauss_Prob = 1.0
-params.ActivationFunction_UnsignedGauss_Prob = 1.0
+params.ActivationFunction_UnsignedGauss_Prob = 0.0
 params.ActivationFunction_Abs_Prob = 1.0
 params.ActivationFunction_SignedSine_Prob = 1.0
-params.ActivationFunction_UnsignedSine_Prob = 1.0
+params.ActivationFunction_UnsignedSine_Prob = 0.0
 params.ActivationFunction_Linear_Prob = 1.0
 params.ActivationFunction_Relu_Prob = 1.0
-params.ActivationFunction_Softplus_Prob = 1.0
+params.ActivationFunction_Softplus_Prob = 0.0
 
 def testNetwork(data, n_classes, genome, evals, file, seed):
     genome = pickle.loads(genome)
