@@ -49,18 +49,6 @@ def createDataSet(choice, seed = 0):
             print "Bad luck no known dataset"
 
 def run_test_validate_splits(callback, X, y, folds=10):
-    # import logging
-    # logging.basicConfig(level=logging.DEBUG)
-
-    # handler = logging.FileHandler('debug.log')
-    # handler.setLevel(logging.DEBUG)
-
-    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    # handler.setFormatter(formatter)
-    # logger = logging.getLogger(__name__)
-    # logger.addHandler(handler)
-    # logger.propagate = False
-    
     from sklearn.cross_validation import StratifiedKFold
     from tqdm import tqdm
     skf_test = StratifiedKFold(y.reshape(-1), n_folds=folds, shuffle=True)
@@ -77,6 +65,19 @@ def run_test_validate_splits(callback, X, y, folds=10):
             y_validate = y_train_validate[validate_index]
 
             callback(X_train, y_train, X_validate, y_validate, X_test, y_test, test_split=i, validate_split=j)
+
+def run_validate_splits(callback, X_train_validate, y_train_validate, X_test, y_test, folds=10, seed=0):
+    from sklearn.cross_validation import StratifiedKFold
+    from tqdm import tqdm
+
+    skf_validate = StratifiedKFold(y_train_validate.reshape(-1), n_folds=folds, shuffle=True, random_state=seed)
+    for j, (train_index, validate_index) in tqdm(enumerate(skf_validate)):
+        X_train = X_train_validate[train_index]
+        y_train = y_train_validate[train_index]
+        X_validate = X_train_validate[validate_index]
+        y_validate = y_train_validate[validate_index]
+
+        callback(X_train, y_train, X_validate, y_validate, X_test, y_test, test_split=0, validate_split=j)
 
 
 # Taken from

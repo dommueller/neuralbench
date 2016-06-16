@@ -4,7 +4,7 @@ import argparse
 from dataset.create import createDataSet
 
 if __name__ == '__main__':
-    algorithms = ["neat","hyperneat", "snes", "cmaes", "backprop", "cosyne"]
+    algorithms = ["neat", "neattanh", "hyperneat", "hyperneattanh", "snes", "cmaes", "backprop", "cosyne", "leea"]
     datasets = ["spiral", "xor", "circle", "gaussian", "mnist"]
     architectures = ["perceptron", "small", "big", "deep"]
 
@@ -27,21 +27,30 @@ if __name__ == '__main__':
     if args.algorithm == "neat":
         import neatExperiment
         neatExperiment.runExperiment(data, args.seed, args.evaluations, args.samples)
+    elif args.algorithm == "neattanh":
+        import neatExperiment
+        neatExperiment.runExperiment(data, args.seed, args.evaluations, args.samples, tanh=True)
     elif args.algorithm == "hyperneat":
         import hyperNeatExperiment
         hyperNeatExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
+    elif args.algorithm == "hyperneattanh":
+        import hyperNeatExperiment
+        hyperNeatExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples, tanh=True)
     elif args.algorithm == "snes":
         import snesExperiment
         snesExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "cmaes":
-        import cmaesExperiment
-        cmaesExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
+        import snesExperiment
+        snesExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples, cmaes=True)
     elif args.algorithm == "backprop":
         import backpropExperiment
         backpropExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     elif args.algorithm == "cosyne":
-        import cosyneExperiment
-        cosyneExperiment.runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
+        from neuralbench.classification.cosyne.cosyneExperiment import runExperiment
+        runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
+    elif args.algorithm == "leea":
+        from neuralbench.classification.leea.leeaExperiment import runExperiment
+        runExperiment(args.architecture, data, args.seed, args.evaluations, args.samples)
     else:
         print "Algorithm not found"
 

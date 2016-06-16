@@ -77,7 +77,6 @@ def createNewPop(old_pop, results, params):
 
     return new_pop
 
-
 def trainNetwork(data, n_classes, buildNet, num_network_weights, file, seed, max_evaluations, params):
     X_train = data["X_train"]
     y_train = dense_to_one_hot(data["y_train"], n_classes)
@@ -120,19 +119,28 @@ def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
     params.mutation_power = 0.03
     params.mutation_rate = 0.04
     params.selection_proportion = 0.4
-    params.batch_size = 10
-    params.initial_weight_range = 2.
+    params.initial_weight_range = 4.
     params.batch_size = num_samples
     np.random.seed(seed)
     file_name = "cosyne_%s_%s_%03d_e%010d_s%05d.dat" % (architecture, dataset["name"], seed, max_evaluations, num_samples)
     f = open(file_name, 'w')
+    f.write("seed\ttest_split\tvalidation_split")
+    f.write("\tpopulation_size\tmutation_power\tmutation_rate\tselection_proportion\tbatch_size\tinitial_weight_range")
+    f.write("\tevaluation_data\tevaluations\tfitness_type\tresult\n")
     buildNet, num_network_weights = cosyneNetworks.createArchitecture(architecture, dataset["name"])
     if dataset["name"] == "mnist":
-        trainNetwork(dataset, 10, buildNet, num_network_weights, f, seed, max_evaluations, params)
+        from neuralbench.classification.dataset.create import run_validate_splits
+        eval_genotype = buildNet(28*28, 10)
+        train_network = configure_for_training(params, max_evaluations, 10, eval_genotype, num_network_weights, seed, f)
+        run_validate_splits(train_network, dataset["X_train"], dataset["y_train"], dataset["X_test"], dataset["y_test"], folds=10, seed=seed)
     else:
-        trainNetwork(dataset, 2, buildNet, num_network_weights, f, seed, max_evaluations, params)
+        from neuralbench.classification.dataset.create import run_validate_splits
+        eval_genotype = buildNet(2, 2)
+        train_network = configure_for_training(params, max_evaluations, 2, eval_genotype, num_network_weights, seed, f)
+        run_validate_splits(train_network, dataset["X_train"], dataset["y_train"], dataset["X_test"], dataset["y_test"], folds=10, seed=seed)
 
     f.close()
+
 
 def configure_for_training(params, max_evaluations, n_classes, eval_genotype, num_network_weights, seed, f):
 
