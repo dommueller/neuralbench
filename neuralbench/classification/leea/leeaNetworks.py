@@ -14,11 +14,11 @@ def build_perceptron_network(net_architecture):
     x = tf.placeholder(tf.float64, [None, net_architecture[0]])
 
 
-    print "Creating w0 and b0, with a: %d and b: %d" % (net_architecture[0], net_architecture[1])
+    # print "Creating w0 and b0, with a: %d and b: %d" % (net_architecture[0], net_architecture[1])
     w0 = tf.placeholder(tf.float64, [net_architecture[0], net_architecture[1]])
     b0 = tf.placeholder(tf.float64, [net_architecture[1]])
 
-    print "Creating pred with (x * w0 + b0)"
+    # print "Creating pred with (x * w0 + b0)"
     pred = tf.add(tf.matmul(x, w0), b0)
 
     # Define loss and accuracy
@@ -44,12 +44,12 @@ def build_multilayer_network(net_architecture):
 
     layers = {}
     for i, (a, b) in enumerate(pairwise(net_architecture)):
-        print "Creating w%d and b%d, with a: %d and b: %d" % (i, i, a, b)
+        # print "Creating w%d and b%d, with a: %d and b: %d" % (i, i, a, b)
         layers["w%d" % i] = tf.placeholder(tf.float64, [a, b])
         layers["b%d" % i] = tf.placeholder(tf.float64, [b])
 
     # tanh((x * W_0) + b_0)
-    print "Creating l0 with tanh(x * w0 + b0)"
+    # print "Creating l0 with tanh(x * w0 + b0)"
     layers["l0"] = tf.nn.tanh(tf.add(tf.matmul(x, layers["w0"]), layers["b0"]))
 
     hidden_layer = len(net_architecture) - 2
@@ -57,10 +57,10 @@ def build_multilayer_network(net_architecture):
     for i in xrange(1, (hidden_layer)):
         # tanh((l_i-1 * W_i) + b_i)
         last_layer = i - 1
-        print "Creating l%d with tanh(l%d * w%d + b%d)" % (i, last_layer, i, i)
+        # print "Creating l%d with tanh(l%d * w%d + b%d)" % (i, last_layer, i, i)
         layers["l%d" % i] = tf.nn.tanh(tf.add(tf.matmul(layers["l%d" % last_layer], layers["w%d" % i]), layers["b%d" % i]))
 
-    print "Creating pred with (l%d * w%d + b%d)" % (hidden_layer-1, hidden_layer, hidden_layer)
+    # print "Creating pred with (l%d * w%d + b%d)" % (hidden_layer-1, hidden_layer, hidden_layer)
     pred = tf.add(tf.matmul(layers["l%d" % (hidden_layer-1)], layers["w%d" % hidden_layer]), layers["b%d" % hidden_layer])
 
     # Define loss and accuracy
