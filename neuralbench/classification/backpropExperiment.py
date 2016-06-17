@@ -299,12 +299,12 @@ def configure_for_training(batch_size, max_evaluations, n_classes, buildNet, see
                 
                 train_evaluations = (generation + 1) * batch_size
 
-                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "train", 0, "acc", acc_train))
-                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "val", 0, "acc", acc_val))
-                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "test", 0, "acc", acc_test))
-                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "train", 0, "cost", c_train))
-                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "val", 0, "cost", c_val))
-                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "test", 0, "cost", c_test))
+                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "train", train_evaluations, "acc", acc_train))
+                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "val", train_evaluations, "acc", acc_val))
+                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "test", train_evaluations, "acc", acc_test))
+                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "train", train_evaluations, "cost", c_train))
+                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "val", train_evaluations, "cost", c_val))
+                f.write("%s\t%s\t%d\t%s\t%f\n" % (file_start, "test", train_evaluations, "cost", c_test))
                 if generation % 100 == 0:
                     f.flush()
 
