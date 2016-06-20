@@ -126,9 +126,12 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
             
             for generation, (batch_index, _) in enumerate(sss):
                 X_current = X_train[batch_index]
-                y_current = y_train_one_hot[batch_index]
+                y_current_correct = y_train_one_hot[batch_index]
+                disturbation_indices = np.random.uniform(0, 1, y_current_correct.shape) >= 0.5
+                y_current_disturbed = np.random.randint(n_classes, size=y_current_correct.shape)
+                y_current_disturbed[disturbation_indices] = y_current_correct[disturbation_indices]
 
-                train_results = np.array([[acc, cost] for acc, cost in [individual.calc_fitness(params, X_current, y_current, sess) for individual in pop]])
+                train_results = np.array([[acc, cost] for acc, cost in [individual.calc_fitness(params, X_current, y_current_disturbed, sess) for individual in pop]])
 
                 sort_population(pop)
                 pop = create_new_population(params, pop)
