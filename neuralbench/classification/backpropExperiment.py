@@ -291,9 +291,13 @@ def configure_for_training(batch_size, max_evaluations, n_classes, buildNet, see
             
             for generation, (batch_index, _) in enumerate(sss):
                 X_current = X_train[batch_index]
-                y_current = y_train_one_hot[batch_index]
+                y_current_correct = y_train_one_hot[batch_index]
+                disturbation_indices = np.random.uniform(0, 1, y_current_correct.shape) >= 0.5
+                y_current_disturbed = np.random.randint(n_classes, size=y_current_correct.shape)
+                y_current_disturbed[disturbation_indices] = y_current_correct[disturbation_indices]
 
-                _, acc_train, c_train = sess.run([optimizer, accuracy, cost], feed_dict={x: X_current, y: y_current})
+
+                _, acc_train, c_train = sess.run([optimizer, accuracy, cost], feed_dict={x: X_current, y: y_current_disturbed})
                 acc_val, c_val = sess.run([accuracy, cost], feed_dict={x: X_validate, y: y_validate})
                 acc_test, c_test = sess.run([accuracy, cost], feed_dict={x: X_test, y: y_test})
                 
