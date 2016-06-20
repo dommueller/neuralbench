@@ -182,6 +182,7 @@ def testNetwork(data, n_classes, subs, genome, evals, file, seed):
     file.write("neat %d %d %f\n" % (seed, evals, acc))
 
 def softmax(w, t = 1.0):
+    w = w - np.max(w) + 20
     e = np.exp(np.array(w) / t)
     dist = e / np.sum(e)
     return dist
@@ -265,8 +266,7 @@ def configure_for_training(batch_size, max_evaluations, n_classes, subs, seed, f
             for example in cur_data:
                 net.Flush()
                 net.Input(example)
-                for _ in range(3):
-                    net.Activate()
+                net.Activate()
 
                 result = softmax(net.Output())
                 results.append(result)
