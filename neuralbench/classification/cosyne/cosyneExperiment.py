@@ -176,9 +176,12 @@ def configure_for_training(params, max_evaluations, n_classes, eval_genotype, nu
             
             for generation, (batch_index, _) in enumerate(sss):
                 X_current = X_train[batch_index]
-                y_current = y_train_one_hot[batch_index]
+                y_current_correct = y_train_one_hot[batch_index]
+                disturbation_indices = np.random.uniform(0, 1, y_current_correct.shape) >= 0.5
+                y_current_disturbed = np.random.randint(n_classes, size=y_current_correct.shape)
+                y_current_disturbed[disturbation_indices] = y_current_correct[disturbation_indices]
 
-                train_results = np.array([[acc, cost] for acc, cost in [eval_genotype(sess, chromosome, X_current, y_current) for chromosome in pop]])
+                train_results = np.array([[acc, cost] for acc, cost in [eval_genotype(sess, chromosome, X_current, y_current_disturbed) for chromosome in pop]])
                 
                 train_cost = train_results[:,1]
                 sort_idx = np.argsort(train_cost)
