@@ -33,7 +33,7 @@ def buildNet_big_layer():
 def buildNet_perceptron_mnist():
     substrate = NEAT.Substrate([(-1, x, y) for x in xrange(28) for y in xrange(28)],
                            [],
-                           [(1, 0, c) for x in xrange(10)])
+                           [(1, 0, x) for x in xrange(10)])
     substrate.m_allow_input_output_links =True;
     substrate.m_hidden_nodes_activation = NEAT.ActivationFunction.TANH;
     substrate.m_output_nodes_activation = NEAT.ActivationFunction.LINEAR;
@@ -42,7 +42,7 @@ def buildNet_perceptron_mnist():
 def buildNet_small_layer_mnist():
     substrate = NEAT.Substrate([(-1, x, y) for x in xrange(28) for y in xrange(28)],
                            [(0, x, y) for x in xrange(8) for y in xrange(10)],
-                           [(1, 0, c) for x in xrange(10)])
+                           [(1, 0, x) for x in xrange(10)])
     substrate.m_hidden_nodes_activation = NEAT.ActivationFunction.TANH;
     substrate.m_output_nodes_activation = NEAT.ActivationFunction.LINEAR;
     return substrate
@@ -50,7 +50,7 @@ def buildNet_small_layer_mnist():
 def buildNet_big_layer_mnist():
     substrate = NEAT.Substrate([(-1, x, y) for x in xrange(28) for y in xrange(28)],
                            [(0, x, y) for x in xrange(20) for y in xrange(20)],
-                           [(1, 0, c) for x in xrange(10)])
+                           [(1, 0, x) for x in xrange(10)])
     substrate.m_hidden_nodes_activation = NEAT.ActivationFunction.TANH;
     substrate.m_output_nodes_activation = NEAT.ActivationFunction.LINEAR;
     return substrate
