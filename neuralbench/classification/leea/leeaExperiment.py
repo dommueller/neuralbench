@@ -13,18 +13,25 @@ class Gene(object):
         self._parent_fitness = parent_fitness
         self._fitness = None
 
+    def __repr__(self):
+        return "Fitness: %.4f - Parent Fitness: %.4f - Weight sum: %.4f\n" % (self._fitness, self._parent_fitness, np.sum(self.chromosome))
+
+    def __str__(self):
+        return "Fitness: %.4f - Parent Fitness: %.4f - Weight sum: %.4f\n" % (self._fitness, self._parent_fitness, np.sum(self.chromosome))
+
     @property
     def fitness(self):
         return self._fitness
 
     def calc_fitness(self, params, X, y, sess):
         acc, c = self.evaluate(X, y, sess)
-        if c > 10000:
-            print "LOSS is over 10000", c
+        # if c > 2000:
+        #     print "LOSS is over 2000", c
 
-        # Need a fitness value to maximize
-        own_fitness = 10000.0 - c
-        self._fitness = (1 - params.parent_fitness_decay) * self._parent_fitness + own_fitness
+        # # Need a fitness value to maximize
+        # own_fitness = 2000.0 - c
+        # self._fitness = (1 - params.parent_fitness_decay) * self._parent_fitness + own_fitness
+        self._fitness = 1.0/(c+1)
         return acc, c
 
     def evaluate(self, X, y, sess):
@@ -68,32 +75,33 @@ def initialize_population(pop_size, chromosome_template, alpha, evaluation_funct
                         , 0, evaluation_function) for _ in xrange(pop_size)]
 
 def sort_population(pop):
-    sorted(pop, key=lambda individual: individual.fitness, reverse=True)
+    sorted_pop = sorted(pop, key=lambda individual: individual.fitness, reverse=True)
+    return sorted_pop
 
 def create_new_population(params, old_pop):
-    pop_size = len(old_pop)
     new_pop = []
-    while len(new_pop) < pop_size:
+    while len(new_pop) < params.population_size:
         # Calculate probabilty for each individual
         fitness_scores = np.array([individual.fitness for individual in old_pop])
         probs = fitness_scores / sum(fitness_scores)
 
         if (np.random.uniform(0, 1) < params.sexual_reproduction_proportion):
-            parents = np.random.choice(pop_size, 2, replace=False, p=probs)
+            parents = np.random.choice(len(old_pop), 2, replace=False, p=probs)
             child1, child2 = old_pop[parents[0]].mate(old_pop[parents[1]])
             new_pop.append(child1)
             new_pop.append(child2)
         else:
-            parent = np.random.choice(pop_size, 1, replace=False, p=probs)
+            parent = np.random.choice(len(old_pop), 1, replace=False, p=probs)
             child = old_pop[parent[0]].mutate(params)
             new_pop.append(child)
 
     params.mutation_power = params.mutation_power * params.mutation_power_decay
 
     # Cut offspring besides population_size
-    return new_pop[:pop_size]
+    return new_pop[:params.population_size]
 
 def configure_for_training(params, max_evaluations, n_classes, eval_net, weights_template, seed, f):
+    elite_size = int(params.population_size * params.selection_proportion)
 
     def train_network(X_train, y_train, X_validate, y_validate, X_test, y_test, test_split=0, validate_split=0):
         file_start = "%d\t%d\t%d" % (seed, test_split, validate_split)
@@ -131,10 +139,10 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
                 y_current_disturbed = np.random.randint(n_classes, size=y_current_correct.shape)
                 y_current_disturbed[disturbation_indices] = y_current_correct[disturbation_indices]
 
-                train_results = np.array([[acc, cost] for acc, cost in [individual.calc_fitness(params, X_current, y_current_disturbed, sess) for individual in pop]])
+                train_results = np.array([[acc, cost] for acc, cost in [individual.calc_fitness(params, X_current, y_current_correct, sess) for individual in pop]])
 
-                sort_population(pop)
-                pop = create_new_population(params, pop)
+                pop = sort_population(pop)
+                pop = create_new_population(params, pop[:elite_size])
 
                 validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
                 best_validation_acc_index = np.argmax(validate_results, axis=0)[0]

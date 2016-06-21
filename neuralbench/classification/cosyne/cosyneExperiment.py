@@ -181,7 +181,7 @@ def configure_for_training(params, max_evaluations, n_classes, eval_genotype, nu
                 y_current_disturbed = np.random.randint(n_classes, size=y_current_correct.shape)
                 y_current_disturbed[disturbation_indices] = y_current_correct[disturbation_indices]
 
-                train_results = np.array([[acc, cost] for acc, cost in [eval_genotype(sess, chromosome, X_current, y_current_disturbed) for chromosome in pop]])
+                train_results = np.array([[acc, cost] for acc, cost in [eval_genotype(sess, chromosome, X_current, y_current_correct) for chromosome in pop]])
                 
                 train_cost = train_results[:,1]
                 sort_idx = np.argsort(train_cost)

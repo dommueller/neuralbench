@@ -297,7 +297,7 @@ def configure_for_training(batch_size, max_evaluations, n_classes, buildNet, see
                 y_current_disturbed[disturbation_indices] = y_current_correct[disturbation_indices]
 
 
-                _, acc_train, c_train = sess.run([optimizer, accuracy, cost], feed_dict={x: X_current, y: y_current_disturbed})
+                _, acc_train, c_train = sess.run([optimizer, accuracy, cost], feed_dict={x: X_current, y: y_current_correct})
                 acc_val, c_val = sess.run([accuracy, cost], feed_dict={x: X_validate, y: y_validate})
                 acc_test, c_test = sess.run([accuracy, cost], feed_dict={x: X_test, y: y_test})
                 
