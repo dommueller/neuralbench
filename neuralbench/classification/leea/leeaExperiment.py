@@ -30,8 +30,10 @@ class Gene(object):
 
         # # Need a fitness value to maximize
         # own_fitness = 2000.0 - c
-        # self._fitness = (1 - params.parent_fitness_decay) * self._parent_fitness + own_fitness
-        self._fitness = 1.0/(c+1)
+
+        own_fitness = 1.0/(c+1)
+        self._fitness = (1 - params.parent_fitness_decay) * self._parent_fitness + own_fitness
+
         return acc, c
 
     def evaluate(self, X, y, sess):
@@ -104,6 +106,7 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
     elite_size = int(params.population_size * params.selection_proportion)
 
     def train_network(X_train, y_train, X_validate, y_validate, X_test, y_test, test_split=0, validate_split=0):
+        params.mutation_power = params.starting_mutation_power
         file_start = "%d\t%d\t%d" % (seed, test_split, validate_split)
 
         assert(n_classes == len(np.unique(y_train)))
@@ -164,13 +167,13 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
 def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
     from neuralbench.classification.dataset.create import run_validate_splits
     params = LeeaParams()
-    params.parent_fitness_decay = 0.2
-    params.starting_mutation_power = 0.03
+    params.parent_fitness_decay = 0.05
     params.mutation_power_decay = 0.99
     params.sexual_reproduction_proportion = 0.5
-    params.population_size = 200
-    params.mutation_power = 0.03
-    params.mutation_rate = 0.04
+    params.population_size = 50
+    params.starting_mutation_power = 0.3
+    params.mutation_power = params.starting_mutation_power
+    params.mutation_rate = 0.4
     params.selection_proportion = 0.4
     params.initial_weight_range = 4.
     params.batch_size = num_samples
