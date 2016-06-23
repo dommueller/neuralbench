@@ -116,8 +116,8 @@ def trainNetwork(data, n_classes, buildNet, num_network_weights, file, seed, max
 def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
     params = CosyneParams()
     params.population_size = 40
-    params.mutation_power = 0.03
-    params.mutation_rate = 0.04
+    params.mutation_power = 0.3
+    params.mutation_rate = 0.4
     params.selection_proportion = 0.4
     params.initial_weight_range = 4.
     params.batch_size = num_samples
