@@ -194,8 +194,9 @@ def configure_for_training(params, max_evaluations, n_classes, eval_genotype, nu
             best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
             acc, cost = eval_genotype(sess, pop[best_validation_acc_index], X_test, y_test)
 
-            train_evaluations = (generation + 1) * evaluations_per_generation
+            train_evaluations = (generation) * evaluations_per_generation
 
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
             f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
             f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
             f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
