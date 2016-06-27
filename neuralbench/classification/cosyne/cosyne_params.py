@@ -62,9 +62,22 @@ class CosyneParams(object):
         self._initial_weight_range = value
 
     def __str__(self):
-        return "%d\t%0.2f\t%0.2f\t%0.1f\t%d\t%0.1f" % (self.population_size, self.mutation_power, self.mutation_rate,
+        return "%d\t%0.5f\t%0.5f\t%0.3f\t%d\t%0.1f" % (self.population_size, self.mutation_power, self.mutation_rate,
                     self.selection_proportion, self.batch_size, self.initial_weight_range)
 
+    def random_initialization(self, seed=None):
+        import random
+        if seed != None:
+            random.seed(seed)
+        else:
+            from datetime import datetime
+            random.seed(datetime.now())
 
+        self.population_size = random.choice([2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000])
+        self.mutation_power = random.random()
+        self.mutation_rate = random.random()
+        self.selection_proportion = random.random()
+        self.batch_size = random.choice([10, 20, 30, 40, 50, 100, 150, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000])
+        self.initial_weight_range = random.choice([0.1, 0.5, 1., 2., 3., 4., 5., 10., 15., 20., 25., 50.,])
 
 

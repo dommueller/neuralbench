@@ -48,16 +48,16 @@ def createDataSet(choice, seed = 0):
         else:
             print "Bad luck no known dataset"
 
-def run_test_validate_splits(callback, X, y, folds=10):
+def run_test_validate_splits(callback, X, y, test_folds=5, validation_folds=10):
     from sklearn.cross_validation import StratifiedKFold
     from tqdm import tqdm
-    skf_test = StratifiedKFold(y.reshape(-1), n_folds=folds, shuffle=True)
+    skf_test = StratifiedKFold(y.reshape(-1), n_folds=test_folds, shuffle=True)
     for i, (train_validate_index, test_index) in tqdm(enumerate(skf_test)):
         X_train_validate = X[train_validate_index]
         y_train_validate = y[train_validate_index]
         X_test = X[test_index]
         y_test = y[test_index]
-        skf_validate = StratifiedKFold(y[train_validate_index].reshape(-1), n_folds=folds, shuffle=True)
+        skf_validate = StratifiedKFold(y[train_validate_index].reshape(-1), n_folds=validation_folds, shuffle=True)
         for j, (train_index, validate_index) in tqdm(enumerate(skf_validate)):
             X_train = X_train_validate[train_index]
             y_train = y_train_validate[train_index]
