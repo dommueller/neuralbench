@@ -14,9 +14,11 @@ def createEnvironment(environment_name):
     elif environment_name == "pendulum":
         return "Pendulum-v0", gym.envs.registry.spec("Pendulum-v0").timestep_limit
     elif environment_name == "nchain":
-        return "NChain-v0", gym.envs.registry.spec("NChain-v0").timestep_limit
+        pass
+        # return "NChain-v0", gym.envs.registry.spec("NChain-v0").timestep_limit
     elif environment_name == "blackjack":
-        return "Blackjack-v0", gym.envs.registry.spec("Blackjack-v0").timestep_limit
+        pass
+        # return "Blackjack-v0", gym.envs.registry.spec("Blackjack-v0").timestep_limit
     elif environment_name == "go9":
         return "Go9x9-v0", gym.envs.registry.spec("Go9x9-v0").timestep_limit
     elif environment_name == "go19":
@@ -38,6 +40,7 @@ if __name__ == '__main__':
     parser.add_argument("dataset", help="the dataset that should be used", choices=datasets)
     parser.add_argument("seed", help="the seed that should be used", type=int)
     parser.add_argument("-a", "--architecture", help="the architecture that should be used if not neat", choices=architectures)
+    parser.add_argument("-s", "--network_size", help="number of hidden units", type=int, default=40)
     parser.add_argument("-e", "--evaluations", help="max number of evaluations", type=int, default=10000)
     args = parser.parse_args()
     if args.architecture:
@@ -55,16 +58,16 @@ if __name__ == '__main__':
         pass
     elif args.algorithm == "snes":
         import snesExperiment
-        snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.seed, step_limit, args.evaluations)
+        snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
     elif args.algorithm == "backprop":
         import backpropExperiment
         pass
     elif args.algorithm == "cosyne":
-        from neuralbench.classification.cosyne.cosyneExperiment import runExperiment
-        pass
+        import cosyneExperiment
+        cosyneExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
     elif args.algorithm == "leea":
-        from neuralbench.classification.leea.leeaExperiment import runExperiment
-        pass
+        import leeaExperiment
+        leeaExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
     else:
         print "Algorithm not found"
 
