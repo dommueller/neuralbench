@@ -220,7 +220,7 @@ if __name__ == '__main__':
     params.random_initialization(seed = seed)
     max_evaluations = 100000
     while (params.population_size * params.batch_size > max_evaluations/2):
-        params.batch_size = random.randint([10, 200])
+        params.batch_size = random.randint(10, 200)
 
     X_train, y_train, X_test, y_test = createDataSet(dataset_name)
     for architecture in ["perceptron", "small", "big", "deep"]:
