@@ -220,7 +220,7 @@ if __name__ == '__main__':
     params.random_initialization(seed = seed)
     max_evaluations = 100000
     while (params.population_size * params.batch_size > max_evaluations/2):
-        params.batch_size = random.choice([10, 20, 30, 40, 50, 100, 150, 200])
+        params.batch_size = random.randint([10, 200])
 
     X_train, y_train, X_test, y_test = createDataSet(dataset_name)
     for architecture in ["perceptron", "small", "big", "deep"]:
@@ -260,7 +260,7 @@ if __name__ == '__main__':
 
         # configure_for_training(params, max_evaluations, n_classes, eval_genotype, num_network_weights, seed, file_identifier)
         train_network = configure_for_training(params, max_evaluations, 10, eval_genotype, num_network_weights, seed, f)
-        run_test_validate_splits(train_network, X_train, y_train, test_folds=5, validation_folds=10)
+        run_test_validate_splits(train_network, X_train, y_train, test_folds=3, validation_folds=5)
 
         f.close()
 

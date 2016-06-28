@@ -65,7 +65,7 @@ def buildNet_single_layer(n_hidden_1):
         b_out = tf.placeholder(tf.float64, [n_classes])
 
         layer_1 = tf.add(tf.matmul(x, h1), b1)
-        layer_1 = tf.nn.tanh(layer_1)
+        layer_1 = tf.nn.relu(layer_1)
         # Output layer with linear activation
         pred = tf.add(tf.matmul(layer_1, out), b_out)
 
@@ -105,11 +105,11 @@ def buildNet_three_layer(n_hidden_1, n_hidden_2, n_hidden_3):
         b_out = tf.placeholder(tf.float64, [n_classes])
 
         layer_1 = tf.add(tf.matmul(x, h1), b1)
-        layer_1 = tf.nn.tanh(layer_1)
+        layer_1 = tf.nn.relu(layer_1)
         layer_2 = tf.add(tf.matmul(layer_1, h2), b2)
-        layer_2 = tf.nn.tanh(layer_2)
+        layer_2 = tf.nn.relu(layer_2)
         layer_3 = tf.add(tf.matmul(layer_2, h3), b3)
-        layer_3 = tf.nn.tanh(layer_3)
+        layer_3 = tf.nn.relu(layer_3)
         # Output layer with linear activation
         pred = tf.add(tf.matmul(layer_3, out), b_out)
 
@@ -156,13 +156,13 @@ def buildNet_four_layer(n_hidden_1, n_hidden_2, n_hidden_3, n_hidden_4):
         b_out = tf.placeholder(tf.float64, [n_classes])
 
         layer_1 = tf.add(tf.matmul(x, h1), b1)
-        layer_1 = tf.nn.tanh(layer_1)
+        layer_1 = tf.nn.relu(layer_1)
         layer_2 = tf.add(tf.matmul(layer_1, h2), b2)
-        layer_2 = tf.nn.tanh(layer_2)
+        layer_2 = tf.nn.relu(layer_2)
         layer_3 = tf.add(tf.matmul(layer_2, h3), b3)
-        layer_3 = tf.nn.tanh(layer_3)
+        layer_3 = tf.nn.relu(layer_3)
         layer_4 = tf.add(tf.matmul(layer_3, h4), b4)
-        layer_4 = tf.nn.tanh(layer_4)
+        layer_4 = tf.nn.relu(layer_4)
         # Output layer with linear activation
         pred = tf.add(tf.matmul(layer_4, out), b_out)
 

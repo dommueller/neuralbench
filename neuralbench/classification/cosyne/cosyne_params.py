@@ -73,11 +73,11 @@ class CosyneParams(object):
             from datetime import datetime
             random.seed(datetime.now())
 
-        self.population_size = random.choice([2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000])
+        self.population_size = random.randint([2, 5000])
         self.mutation_power = random.random()
         self.mutation_rate = random.random()
         self.selection_proportion = random.random()
-        self.batch_size = random.choice([10, 20, 30, 40, 50, 100, 150, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000])
-        self.initial_weight_range = random.choice([0.1, 0.5, 1., 2., 3., 4., 5., 10., 15., 20., 25., 50.,])
+        self.batch_size = random.choice([10, 30000])
+        self.initial_weight_range = random.random() * 50
 
 
