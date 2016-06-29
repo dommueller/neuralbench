@@ -117,6 +117,23 @@ class LeeaParams(object):
         return "%d\t%0.2f\t%0.2f\t%0.1f\t%d\t%0.1f" % (self.population_size, self.starting_mutation_power, self.mutation_rate,
                     self.selection_proportion, self.batch_size, self.initial_weight_range)
 
+    def random_initialization(self, seed=None):
+        import random
+        if seed != None:
+            random.seed(seed)
+        else:
+            from datetime import datetime
+            random.seed(datetime.now())
 
+        self.parent_fitness_decay = random.random()
+        self.starting_mutation_power = random.random() * 10
+        self.mutation_power_decay = random.random()
+        self.sexual_reproduction_proportion = None
+        self.population_size = random.randint(2, 1000)
+        self.mutation_power = starting_mutation_power
+        self.mutation_rate = random.random()
+        self.selection_proportion = random.random()
+        self.batch_size = random.randint(10, 30000)
+        self.initial_weight_range = random.random() * 50
 
 

@@ -201,3 +201,27 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, step_limi
     train_network(env_name, seed, step_limit, max_evaluations, f, build_network, params)
 
     f.close()
+
+if __name__ == '__main__':
+    import sys
+    seed = int(sys.argv[1])
+
+    datasets = ["CartPole-v0", "Acrobot-v0", "MountainCar-v0", "Pendulum-v0"]
+    params = LeeaParams()
+    params.random_initialization(seed = seed)
+    max_evaluations = 5000
+
+    for architecture in ["simple", "recurrent"]:
+        for env_name in datasets:
+            for network_size in [1, 5, 10, 40, 100, 300]:
+                step_limit = gym.envs.registry.spec(env_name).timestep_limit
+                dataset_name = env_name.split("-")[0].lower()
+                file_identifier = "params_leea_%s_%d_%s_%03d-%s" % (architecture, network_size, dataset_name, seed, str(params).replace("\t", "_"))
+                print "Starting parameter sweep for leea %s" % file_identifier
+                file_name = "%s.dat" % (file_identifier)
+                f = open(file_name, 'w')
+                f.write("seed\tevaluations\trun\tresult\n")
+                build_network = net_configuration(architecture, network_size, env_name)
+                train_network(env_name, seed, step_limit, max_evaluations, f, build_network, params)
+
+                f.close()
