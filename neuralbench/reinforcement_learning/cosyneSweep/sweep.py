@@ -116,7 +116,7 @@ def main(job_id, input_params):
         print reward, reward/100
         cum_reward += reward
 
-    return cum_reward
+    return -cum_reward
 
 if __name__ == '__main__':
     params = {"population_size": 2, "mutation_power": 0.000001, "mutation_rate": 0.000001, "selection_proportion": 1., "initial_weight_range": 0.5}
