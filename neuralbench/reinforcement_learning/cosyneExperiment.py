@@ -60,7 +60,7 @@ def permute_inplace(population):
 def create_new_generation(old_pop, results, params):
     top_idx = int(len(old_pop) * params.selection_proportion)
     top_idx = 2 if top_idx < 2 else top_idx
-    elite = old_pop[0:top_idx]
+    elite = np.array(old_pop[0:top_idx], copy=True)
     offspring = []
     needed_offsprings = len(old_pop) - top_idx
     for _ in xrange(needed_offsprings/2 + 1):
@@ -77,11 +77,9 @@ def create_new_generation(old_pop, results, params):
         offspring.append(child2)
 
     permute_inplace(elite)
-    new_pop = old_pop[:]
-    new_pop[0:top_idx] = elite
-    new_pop[top_idx:] = offspring[0:needed_offsprings]
-
-    assert(len(old_pop) == len(new_pop))
+    new_pop = np.append(elite, offspring, axis=0)
+    new_pop = new_pop[:len(old_pop)]
+    assert(old_pop.shape == new_pop.shape)
 
     return new_pop
 
