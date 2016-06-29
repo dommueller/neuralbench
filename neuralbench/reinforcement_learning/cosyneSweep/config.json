@@ -1,0 +1,38 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "sweep.py",
+    "experiment-name" : "simple-20-cosyne-sweep",
+    "likelihood"      : "GAUSSIAN",
+    "variables" : {
+        "population_size" : {
+            "type" : "INT",
+            "size" : 1,
+            "min"  : 2,
+            "max"  : 1000
+        },
+        "mutation_power" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 10
+        },
+        "mutation_rate" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 1
+        },
+        "selection_proportion" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 1
+        },
+        "initial_weight_range" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 50
+        }
+    }
+}
