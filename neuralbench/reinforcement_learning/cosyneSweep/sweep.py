@@ -111,12 +111,14 @@ def main(job_id, input_params):
         step_limit = gym.envs.registry.spec(env_name).timestep_limit
         build_network = net_configuration(architecture, network_size, env_name)
         reward = train_network(env_name, step_limit, max_evaluations, build_network, params)
+        if env_name == "Pendulum-v0":
+            reward /= 10
         print reward, reward/100
         cum_reward += reward
 
     return cum_reward
 
 if __name__ == '__main__':
-    params = {"population_size": 10, "mutation_power": 0.4, "mutation_rate": 0.4, "selection_proportion": 0.2, "initial_weight_range": 1.}
+    params = {"population_size": 2, "mutation_power": 0.000001, "mutation_rate": 0.000001, "selection_proportion": 0.01, "initial_weight_range": 0.5}
     rewards =  main(1, params)
     print rewards, rewards/400
