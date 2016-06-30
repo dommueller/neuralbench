@@ -102,7 +102,7 @@ def main(job_id, input_params):
     params.selection_proportion = input_params["selection_proportion"]
     params.initial_weight_range = input_params["initial_weight_range"]
 
-    max_evaluations = 10
+    max_evaluations = 5000
     architecture = "simple"
     network_size = 20
 

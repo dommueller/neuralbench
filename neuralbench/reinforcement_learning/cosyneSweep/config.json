@@ -3,6 +3,7 @@
     "main-file"       : "sweep.py",
     "experiment-name" : "simple-20-cosyne-sweep",
     "likelihood"      : "GAUSSIAN",
+    "max-concurrent"  : 20,
     "variables" : {
         "population_size" : {
             "type" : "INT",
