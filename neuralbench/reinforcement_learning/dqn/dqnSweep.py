@@ -44,14 +44,14 @@ def eval(input_params, network_size):
 if __name__ == '__main__':
     import sys
     import random
-    import tqdm
+    from tqdm import *
 
     for network_size in tqdm([1, 5, 10, 40, 100, 300]):
         for seed in tqdm(xrange(100)):
             params = DqnParams()
             params.random_initialization(seed = seed)
             file_identifier = "params_dqn_simple_%d_%03d-%s" % (network_size, seed, str(params).replace("\t", "_"))
-            print "Starting parameter sweep for dqn %s" % file_identifier
+            # print "Starting parameter sweep for dqn %s" % file_identifier
             file_name = "%s.dat" % (file_identifier)
             f = open(file_name, 'w')
             f.write("result\tseed\tnetwork_size")
