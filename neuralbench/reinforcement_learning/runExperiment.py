@@ -31,7 +31,7 @@ if __name__ == '__main__':
     logger.setLevel(logging.ERROR)
 
 
-    algorithms = ["neat", "hyperneat", "snes", "backprop", "cosyne", "leea"]
+    algorithms = ["neat", "hyperneat", "snes", "dqn", "cosyne", "leea"]
     datasets = ["cartpole", "acrobot", "mountaincar", "pendulum", "nchain", "blackjack", "go9", "go19"]
     architectures = ["simple", "recurrent"]
 
@@ -59,9 +59,9 @@ if __name__ == '__main__':
     elif args.algorithm == "snes":
         import snesExperiment
         snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
-    elif args.algorithm == "backprop":
-        import backpropExperiment
-        pass
+    elif args.algorithm == "dqn":
+        import dqn.dqnExperiment
+        dqn.dqnExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
     elif args.algorithm == "cosyne":
         import cosyneExperiment
         cosyneExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
