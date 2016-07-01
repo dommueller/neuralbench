@@ -99,6 +99,7 @@ def create_new_population(params, old_pop):
     while len(new_pop) < params.population_size:
         # Calculate probabilty for each individual
         fitness_scores = np.array([individual.fitness for individual in old_pop])
+        fitness_scores = fitness_scores - np.min(fitness_scores) + 1
         probs = fitness_scores / sum(fitness_scores)
 
         if (np.random.uniform(0, 1) < params.sexual_reproduction_proportion):
