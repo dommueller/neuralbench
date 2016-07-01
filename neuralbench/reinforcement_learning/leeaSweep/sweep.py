@@ -77,8 +77,8 @@ def main(job_id, input_params):
     datasets = ["CartPole-v0", "Acrobot-v0", "MountainCar-v0", "Pendulum-v0"]
     params = LeeaParams()
     params.parent_fitness_decay = input_params["parent_fitness_decay"]
-    params.mutation_power_decay = input_params["mutation_power_decay"]
-    params.sexual_reproduction_proportion = input_params["sexual_reproduction_proportion"]
+    params.mutation_power_decay = 0.99
+    params.sexual_reproduction_proportion = 0.5
     params.population_size = input_params["population_size"]
     params.starting_mutation_power = input_params["starting_mutation_power"]
     params.mutation_power = params.starting_mutation_power
