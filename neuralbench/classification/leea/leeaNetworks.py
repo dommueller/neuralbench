@@ -50,7 +50,7 @@ def build_multilayer_network(net_architecture):
 
     # tanh((x * W_0) + b_0)
     # print "Creating l0 with tanh(x * w0 + b0)"
-    layers["l0"] = tf.nn.tanh(tf.add(tf.matmul(x, layers["w0"]), layers["b0"]))
+    layers["l0"] = tf.nn.relu(tf.add(tf.matmul(x, layers["w0"]), layers["b0"]))
 
     hidden_layer = len(net_architecture) - 2
 
@@ -58,7 +58,7 @@ def build_multilayer_network(net_architecture):
         # tanh((l_i-1 * W_i) + b_i)
         last_layer = i - 1
         # print "Creating l%d with tanh(l%d * w%d + b%d)" % (i, last_layer, i, i)
-        layers["l%d" % i] = tf.nn.tanh(tf.add(tf.matmul(layers["l%d" % last_layer], layers["w%d" % i]), layers["b%d" % i]))
+        layers["l%d" % i] = tf.nn.relu(tf.add(tf.matmul(layers["l%d" % last_layer], layers["w%d" % i]), layers["b%d" % i]))
 
     # print "Creating pred with (l%d * w%d + b%d)" % (hidden_layer-1, hidden_layer, hidden_layer)
     pred = tf.add(tf.matmul(layers["l%d" % (hidden_layer-1)], layers["w%d" % hidden_layer]), layers["b%d" % hidden_layer])

@@ -119,14 +119,14 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
         pop = initialize_population(params.population_size, weights_template, params.initial_weight_range, eval_net)
 
         with tf.Session() as sess:
-            validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
-            best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
-            acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
+            # validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
+            # best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
+            # acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
 
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "acc", np.max(validate_results, axis=0)[0]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "acc", acc))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "cost", np.min(validate_results, axis=0)[1]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "cost", cost))
+            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "acc", np.max(validate_results, axis=0)[0]))
+            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "acc", acc))
+            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "cost", np.min(validate_results, axis=0)[1]))
+            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "cost", cost))
 
             evaluations_per_generation = params.population_size * params.batch_size
             num_generations = max_evaluations/(evaluations_per_generation) + 1
@@ -135,7 +135,9 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
             from sklearn.cross_validation import StratifiedShuffleSplit
             sss = StratifiedShuffleSplit(y_train.reshape(-1), num_generations, train_size=params.batch_size, random_state=seed)
             
-            for generation, (batch_index, _) in enumerate(sss):
+            generation = 0
+            for batch_index, _ in sss:
+                generation += 1
                 X_current = X_train[batch_index]
                 y_current_correct = y_train_one_hot[batch_index]
                 disturbation_indices = np.random.uniform(0, 1, y_current_correct.shape) >= 0.5
@@ -147,20 +149,20 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
                 pop = sort_population(pop)
                 pop = create_new_population(params, pop[:elite_size])
 
-                validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
-                best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
-                acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
-                
-                train_evaluations = (generation + 1) * evaluations_per_generation
+            validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
+            best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
+            acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
+            
+            train_evaluations = (generation) * evaluations_per_generation
 
-                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
-                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
-                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
-                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
-                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "cost", np.min(validate_results, axis=0)[1]))
-                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "cost", cost))
-                if generation % 100 == 0:
-                    f.flush()
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "cost", np.min(validate_results, axis=0)[1]))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "cost", cost))
+            # if generation % 100 == 0:
+            f.flush()
 
     return train_network
 
@@ -197,51 +199,40 @@ def runExperiment(architecture, dataset, seed, max_evaluations, num_samples):
 
     f.close()
 
+
 if __name__ == '__main__':
-    print "Starting parameter sweep for leea"
     import sys
+    import random
     from tqdm import *
     from neuralbench.classification.dataset.create import createDataSet, run_test_validate_splits
+    seed = int(sys.argv[1])
     
-    dataset_name = "spiral"
-    architecture = "deep"
+    dataset_name = "mnist"
+    # architecture = random.choice(["perceptron", "small", "big", "deep"])
+    params = LeeaParams()
+    params.random_initialization(seed = seed)
+    max_evaluations = 100000
+    while (params.population_size * params.batch_size > max_evaluations/2):
+        params.batch_size = random.randint(10, 200)
 
-    # for dataset_name in tqdm(["spiral", "circle"]):
-    #     for architecture in tqdm(["perceptron", "small", "big", "deep"]):
-    
     X_train, y_train, X_test, y_test = createDataSet(dataset_name)
-    eval_net, weights_template = leeaNetworks.createArchitecture(architecture, dataset_name)
+    for architecture in ["perceptron", "small", "big", "deep"]:
+        eval_net, weights_template = leeaNetworks.createArchitecture(architecture, dataset_name)
 
-    PARENT_FITNESS_DECAY = 0.2
-    STARTING_MUTATION_POWER = 0.03
-    MUTATION_POWER = 0.03
-    MUTATION_RATE = 0.4
+        file_identifier = "params_leea_%s_%s_%03d-%s" % (architecture, dataset_name, seed, str(params).replace("\t", "_"))
+        print "Starting parameter sweep for leea %s" % file_identifier
+        file_name = "%s.dat" % (file_identifier)
+        f = open(file_name, 'w')
+        f.write("seed\ttest_split\tvalidation_split")
+        f.write("\tparent_fitness_decay\tpopulation_size\tmutation_power\tmutation_rate\tselection_proportion\tbatch_size\tinitial_weight_range")
+        f.write("\tevaluation_data\tevaluations\tfitness_type\tresult\n")
 
-    # POPULATION_SIZE = 1000
-    SELECTION_PROPORTION = 0.4
-    MUTATION_POWER_DECAY = 0.99
-    SEXUAL_REPRODUCTION_PROPORTION = 0.5
-    
-    INITIAL_WEIGHT_RANGE = 4
-    seed = 0
-    file_identifier = str(sys.argv[1]) + "/params_leea_%s_%s_%03d_%.2f_%.2f_%.2f_%.1f" % (architecture, dataset_name, seed,
-                                MUTATION_POWER, MUTATION_RATE, SELECTION_PROPORTION, INITIAL_WEIGHT_RANGE)
-    file_name = "%s.dat" % (file_identifier)
-    f = open(file_name, 'w')
-    f.write("seed\ttest_split\tvalidation_split")
-    f.write("\tpopulation_size\tmutation_power\tmutation_rate\tselection_proportion\tbatch_size\tinitial_weight_range")
-    f.write("\tevaluation_data\tevaluations\tfitness_type\tresult\n")
+        # configure_for_training(params, max_evaluations, n_classes, eval_genotype, num_network_weights, seed, file_identifier)
+        train_network = configure_for_training(params, max_evaluations, 10, eval_net, weights_template, seed, f)
+        run_test_validate_splits(train_network, X_train, y_train, test_folds=3, validation_folds=5)
 
-    for population_size in tqdm([10, 40, 100, 400, 1000]):
-        for batch_size in tqdm([10, 20, 40, 80, 100, 150, 200, 250]):
-            standard_params = "%d\t%0.2f\t%0.2f\t%0.1f\t%d\t%0.1f" % (population_size, MUTATION_POWER, MUTATION_RATE,
-                    SELECTION_PROPORTION, batch_size, INITIAL_WEIGHT_RANGE)
 
-            # configure_for_training(params, max_evaluations, n_classes, eval_genotype, num_network_weights, seed, file_identifier)
-            train_network = configure_for_training(standard_params, 300000, 2, eval_net, weights_template, seed, f)
-            run_test_validate_splits(train_network, X_train, y_train, folds=10)
-
-    f.close()
+        f.close()
 
 
 

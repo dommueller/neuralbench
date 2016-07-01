@@ -114,7 +114,7 @@ class LeeaParams(object):
         self._initial_weight_range = value
 
     def __str__(self):
-        return "%d\t%0.2f\t%0.2f\t%0.1f\t%d\t%0.1f" % (self.population_size, self.starting_mutation_power, self.mutation_rate,
+        return "%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%d\t%0.1f" % (self.parent_fitness_decay, self.population_size, self.starting_mutation_power, self.mutation_rate,
                     self.selection_proportion, self.batch_size, self.initial_weight_range)
 
     def random_initialization(self, seed=None):
@@ -125,15 +125,15 @@ class LeeaParams(object):
             from datetime import datetime
             random.seed(datetime.now())
 
-        self.parent_fitness_decay = random.random()
-        self.starting_mutation_power = random.random() * 10
-        self.mutation_power_decay = random.random()
-        self.sexual_reproduction_proportion = None
+        self.parent_fitness_decay = round(random.random(), 2)
+        self.starting_mutation_power = round(random.random() * 10, 2)
+        self.mutation_power_decay = 0.99
+        self.sexual_reproduction_proportion = 0.5
         self.population_size = random.randint(2, 1000)
-        self.mutation_power = starting_mutation_power
-        self.mutation_rate = random.random()
-        self.selection_proportion = random.random()
+        self.mutation_power = self.starting_mutation_power
+        self.mutation_rate = round(random.random(), 2)
+        self.selection_proportion = round(random.random(), 2)
         self.batch_size = random.randint(10, 30000)
-        self.initial_weight_range = random.random() * 50
+        self.initial_weight_range = round(random.random() * 50, 1)
 
 
