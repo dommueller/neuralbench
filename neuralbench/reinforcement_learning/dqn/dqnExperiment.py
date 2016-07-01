@@ -8,8 +8,9 @@ from dqn_params import DqnParams
 class DQN():
     # DQN Agent inspired by: Flood Sung
     # https://gist.github.com/songrotek/3b9d893f1e0788f8fad0e6b49cde70f1#file-dqn-py
-    def __init__(self, env, net_size, hyperparameters):
+    def __init__(self, env, net_size, hyperparameters, max_evaluations):
         self.hyperparameters = hyperparameters
+        self.max_evaluations = max_evaluations
         # init experience replay
         self.replay_buffer = deque()
         # init some parameters
@@ -83,11 +84,12 @@ class DQN():
             self.state_input:[state]
             })[0]
         if random.random() <= self.epsilon:
-            return random.randint(0,self.action_dim - 1)
+            action = random.randint(0,self.action_dim - 1)
         else:
-            return np.argmax(Q_value)
+            action = np.argmax(Q_value)
 
-        self.epsilon -= (self.hyperparameters.initial_epsilon - self.hyperparameters.final_epsilon)/EPISODE
+        self.epsilon -= (self.hyperparameters.initial_epsilon - self.hyperparameters.final_epsilon)/self.max_evaluations
+        return action
 
     def action(self,state):
         return np.argmax(self.Q_value.eval(feed_dict = {
@@ -101,6 +103,49 @@ class DQN():
     def bias_variable(self,shape):
         initial = tf.constant(0.01, shape = shape)
         return tf.Variable(initial)
+
+class DQN_continous(DQN):
+    def __init__(self, env, net_size, hyperparameters, max_evaluations):
+        self.hyperparameters = hyperparameters
+        self.max_evaluations = max_evaluations
+        # init experience replay
+        self.replay_buffer = deque()
+        # init some parameters
+        self.epsilon = self.hyperparameters.initial_epsilon
+        self.state_dim = len(np.reshape(env.observation_space.sample(), -1))
+        self.action_dim = 2 * len(np.reshape(env.action_space.sample(), -1))
+
+        self.create_Q_network(net_size)
+        self.create_training_method()
+
+        # Init session
+        self.session = tf.InteractiveSession()
+        self.session.run(tf.initialize_all_variables())
+
+    def perceive(self,state,action,reward,next_state,done):
+        self.replay_buffer.append((state,action,reward,next_state,done))
+        if len(self.replay_buffer) > self.hyperparameters.replay_size:
+            self.replay_buffer.popleft()
+
+        if len(self.replay_buffer) > self.hyperparameters.batch_size:
+            self.train_Q_network()
+
+    def egreedy_action(self,state):
+        Q_value = self.Q_value.eval(feed_dict = {
+            self.state_input:[state]
+            })[0]
+        if random.random() <= self.epsilon:
+            action = np.array([random.random() * 2 for _ in xrange(self.action_dim)])
+        else:
+            action = Q_value
+
+        self.epsilon -= (self.hyperparameters.initial_epsilon - self.hyperparameters.final_epsilon)/self.max_evaluations
+        return action
+
+    def action(self,state):
+        Q_value = self.Q_value.eval(feed_dict = {self.state_input:[state]})[0]
+        return Q_value
+
 
 def test(agent, env):
     total_reward = 0
@@ -140,7 +185,10 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     f.write("seed\tevaluations\trun\tresult\n")
 
     env = gym.make(env_name)
-    agent = DQN(env, network_size, params)
+    if dataset == "pendulum":
+        agent = DQN_continous(env, network_size, params, max_evaluations)
+    else:
+        agent = DQN(env, network_size, params, max_evaluations)
 
     # Train for max_evaluations episodes
     for train_i in xrange(max_evaluations):

@@ -1,4 +1,4 @@
-from dqnExperiment import DQN, train, test
+from dqnExperiment import DQN, DQN_continous, train, test
 from dqn_params import DqnParams
 
 import gym
@@ -18,7 +18,10 @@ def eval(input_params, network_size):
     total_reward = 0
     for env_name in datasets:
         env = gym.make(env_name)
-        agent = DQN(env, network_size, params)
+        if env_name == "Pendulum-v0":
+            agent = DQN_continous(env, network_size, params, max_evaluations)
+        else:
+            agent = DQN(env, network_size, params, max_evaluations)
 
         # Train for max_evaluations episodes
         for train_i in xrange(max_evaluations):
