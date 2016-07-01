@@ -159,6 +159,7 @@ def train_network(env_name, seed, step_limit, max_evaluations, f, build_network,
 
     num_generations = max_evaluations/params.population_size + 1
     elite_size = int(params.population_size * params.selection_proportion)
+    elite_size = 2 if elite_size < 2 else elite_size
 
     best = None
     for generation in xrange(num_generations):
