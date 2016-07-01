@@ -27,7 +27,7 @@ def eval(input_params, network_size):
         for train_i in xrange(max_evaluations):
             train(agent, env)
 
-        cum_reward
+        cum_reward = 0
         # Test for 100 episodes
         for test_i in xrange(NUM_TEST_RUNS):
             cum_reward += test(agent, env)
@@ -44,10 +44,10 @@ def eval(input_params, network_size):
 if __name__ == '__main__':
     import sys
     import random
+    import tqdm
 
-
-    for network_size in [1, 5, 10, 40, 100, 300]:
-        for seed in xrange(100):
+    for network_size in tqdm([1, 5, 10, 40, 100, 300]):
+        for seed in tqdm(xrange(100)):
             params = DqnParams()
             params.random_initialization(seed = seed)
             file_identifier = "params_dqn_simple_%d_%03d-%s" % (network_size, seed, str(params).replace("\t", "_"))
