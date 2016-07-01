@@ -47,6 +47,7 @@ def train_network(env_name, step_limit, max_evaluations, build_network, params):
 
     num_generations = max_evaluations/params.population_size + 1
     elite_size = int(params.population_size * params.selection_proportion)
+    elite_size = 2 if elite_size < 2 else elite_size
 
     best = None
     for generation in xrange(num_generations):
@@ -102,7 +103,7 @@ def main(job_id, input_params):
     return -cum_reward
 
 if __name__ == '__main__':
-    params = {"parent_fitness_decay": 0.2, "mutation_power_decay": 0.99, "sexual_reproduction_proportion": 0.5, "population_size": 5, "starting_mutation_power": 1., "mutation_rate": 0.4, "selection_proportion": 0.4}
+    params = {"initial_weight_range": 0.500000, "parent_fitness_decay": 0.010000, "population_size": 5, "starting_mutation_power": 0.000001, "mutation_rate": 0.000001, "selection_proportion": 0.010000}
 
     rewards =  main(1, params)
     print rewards, rewards/400
