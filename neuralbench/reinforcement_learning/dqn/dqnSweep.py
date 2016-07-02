@@ -14,6 +14,7 @@ def eval(input_params, network_size):
     max_evaluations = 5000
     architecture = "simple"
     network_size = 20
+    NUM_TEST_RUNS = 100
 
     total_reward = 0
     for env_name in datasets:
