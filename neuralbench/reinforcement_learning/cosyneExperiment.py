@@ -67,8 +67,9 @@ def create_new_generation(old_pop, results, params):
         # parents = np.random.choice(len(elite), 2, replace=False, p=softmax(-np.array(results[0:top_idx])))
         # Substract max, so that lowest will have highest prob
         # new_results = np.array(results[0:top_idx]) - (results[-1] + 1)
-        new_results = 1.0 / results[0:top_idx]
-        probs = new_results / sum(new_results)
+        fitness_scores = results[0:top_idx]
+        fitness_scores = fitness_scores - np.min(fitness_scores) + 1
+        probs = fitness_scores / sum(fitness_scores)
         parents = np.random.choice(len(elite), 2, replace=False, p=probs)
         child1, child2 = uniform_crossover(elite[parents[0]], elite[parents[1]])
         child1 = uniform_mutation(child1, params)
