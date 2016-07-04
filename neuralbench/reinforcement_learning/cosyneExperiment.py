@@ -26,6 +26,8 @@ def net_configuration(architecture, network_size, env_name):
         input_size = len(np.reshape(env.observation_space.sample(), -1))
         output_size = 2 * len(np.reshape(env.action_space.sample(), -1))
 
+    env.close()
+
     if architecture == "simple":
         return build_simple_network(input_size, network_size, output_size)
     elif architecture == "recurrent":
@@ -69,7 +71,7 @@ def create_new_generation(old_pop, results, params):
         # new_results = np.array(results[0:top_idx]) - (results[-1] + 1)
         fitness_scores = results[0:top_idx]
         fitness_scores = fitness_scores - np.min(fitness_scores) + 1
-        probs = fitness_scores / sum(fitness_scores)
+        probs = fitness_scores / float(sum(fitness_scores))
         parents = np.random.choice(len(elite), 2, replace=False, p=probs)
         child1, child2 = uniform_crossover(elite[parents[0]], elite[parents[1]])
         child1 = uniform_mutation(child1, params)
@@ -88,21 +90,24 @@ def create_new_generation(old_pop, results, params):
 def train_network(env_name, seed, step_limit, max_evaluations, f, build_network, params):
     env = gym.make(env_name)
     discrete_output = isinstance(env.action_space, gym.spaces.discrete.Discrete)
+    env.close()
 
-    def run_network(chromosome, current_seed=None, env=None):
+    def run_network(chromosome, current_seed=None, input_env=None):
         nn = build_network()
         nn._setParameters(np.array(chromosome)) 
 
-        if env == None:
-            env = gym.make(env_name)
+        if input_env == None:
+            current_env = gym.make(env_name)
+        else:
+            current_env = input_env
         if current_seed != None:
-            env.seed(current_seed)
+            current_env.seed(current_seed)
 
         cum_reward = 0
         episode_count = 1
 
         for _ in xrange(episode_count):
-            ob = env.reset()
+            ob = current_env.reset()
 
             for _ in xrange(step_limit):
                 result = nn.activate(np.reshape(ob, -1))
@@ -117,12 +122,15 @@ def train_network(env_name, seed, step_limit, max_evaluations, f, build_network,
                         print "Something went wrong with: ", result
                         action = np.random.uniform(0, 1)
 
-                ob, reward, done, _ = env.step(action)
+                ob, reward, done, _ = current_env.step(action)
                 cum_reward += reward
                 if done:
                     break
 
             nn.reset()
+
+        if input_env == None:
+            current_env.close()
 
         return cum_reward
 
@@ -133,14 +141,18 @@ def train_network(env_name, seed, step_limit, max_evaluations, f, build_network,
 
     best = None
     for generation in xrange(num_generations):
-        results = np.array([run_network(individium, generation) for individium in population])
+        results = np.array([run_network(individium, current_seed=generation) for individium in population])
         sort_idx = np.argsort(results)[::-1]
         sorted_pop = population[sort_idx]
         sorted_results = results[sort_idx]
         best = sorted_pop[0]
         population = create_new_generation(sorted_pop, sorted_results, params)
+        hp = hpy()
+        before = hp.heap()
+        print before
+        print "generation: %d, best: %d" % (generation, sorted_results[0])
 
-    
+    env = gym.make(env_name)
     net = build_network()
     net._setParameters(best) 
     for run in xrange(100):
@@ -169,6 +181,8 @@ def train_network(env_name, seed, step_limit, max_evaluations, f, build_network,
         f.write("%03d\t%d\t%d\t%.3f\n" % (seed, (num_generations * params.population_size), run, cum_reward))
         if run % 10 == 0:
             f.flush()
+
+    env.close()
 
 
 def runExperiment(env_name, dataset, architecture, network_size, seed, step_limit, max_evaluations):
