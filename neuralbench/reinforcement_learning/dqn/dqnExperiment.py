@@ -53,8 +53,8 @@ class DQN():
         if len(self.replay_buffer) > self.hyperparameters.replay_size:
             self.replay_buffer.popleft()
 
-        if len(self.replay_buffer) > self.hyperparameters.batch_size:
-            self.train_Q_network()
+        # if len(self.replay_buffer) > self.hyperparameters.batch_size:
+        #     self.train_Q_network()
 
     def train_Q_network(self):
         # Step 1: obtain random minibatch from replay memory
@@ -128,8 +128,8 @@ class DQN_continous(DQN):
         if len(self.replay_buffer) > self.hyperparameters.replay_size:
             self.replay_buffer.popleft()
 
-        if len(self.replay_buffer) > self.hyperparameters.batch_size:
-            self.train_Q_network()
+        # if len(self.replay_buffer) > self.hyperparameters.batch_size:
+        #     self.train_Q_network()
 
     def egreedy_action(self,state):
         Q_value = self.Q_value.eval(feed_dict = {
@@ -170,6 +170,9 @@ def train(agent, env):
         state = next_state
         if done:
             break
+    if len(agent.replay_buffer) > agent.hyperparameters.batch_size:
+        for _ in xrange(10):
+            agent.train_Q_network()
 
 def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations):
     params = DqnParams()
