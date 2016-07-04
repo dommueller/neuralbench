@@ -204,6 +204,11 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, step_limi
     f.close()
 
 if __name__ == '__main__':
+    import logging
+    gym.undo_logger_setup()
+    logger = logging.getLogger()
+    logger.setLevel(logging.ERROR)
+
     import sys
     seed = int(sys.argv[1])
 
