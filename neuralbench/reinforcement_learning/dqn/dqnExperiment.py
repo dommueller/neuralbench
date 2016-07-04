@@ -18,6 +18,7 @@ class DQN():
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n 
 
+        tf.reset_default_graph()
         self.create_Q_network(net_size)
         self.create_training_method()
 
