@@ -64,7 +64,7 @@ class DqnParams(object):
 
         self.gamma = round(random.random(), 2)
         self.initial_epsilon = round(random.random(), 2)
-        self.final_epsilon = max(0, round(self.initial_epsilon - random.random()))
+        self.final_epsilon = max(0, round(self.initial_epsilon - random.random(), 2))
         self.replay_size = random.randint(1000, 100000)
         self.batch_size = 2 ** random.randint(1, 9)
 
