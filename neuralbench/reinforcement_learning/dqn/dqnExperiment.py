@@ -211,4 +211,46 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     f.close()
 
 if __name__ == '__main__':
-    main()
+    import logging
+    gym.undo_logger_setup()
+    logger = logging.getLogger()
+    logger.setLevel(logging.ERROR)
+    import sys
+    seed = int(sys.argv[1])
+
+    datasets = ["CartPole-v0", "Acrobot-v0", "MountainCar-v0", "Pendulum-v0"]
+    params = DqnParams()
+    params.random_initialization(seed = seed)
+    max_evaluations = 20000
+    NUM_TEST_RUNS = 100
+
+    for env_name in datasets:
+        for network_size in [40]:
+            step_limit = gym.envs.registry.spec(env_name).timestep_limit
+            dataset_name = env_name.split("-")[0].lower()
+            file_identifier = "params_dqn_%s_%d_%s_%03d-%s" % (architecture, network_size, dataset_name, seed, str(params).replace("\t", "_"))
+            print "Starting parameter sweep for dqn %s" % file_identifier
+            file_name = "%s.dat" % (file_identifier)
+            f = open(file_name, 'w')
+            f.write("seed\tevaluations\trun\tresult\n")
+            env = gym.make(env_name)
+            if dataset == "pendulum":
+                agent = DQN_continous(env, network_size, params, max_evaluations)
+            else:
+                agent = DQN(env, network_size, params, max_evaluations)
+
+            # Train for max_evaluations episodes
+            for train_i in xrange(max_evaluations):
+                if train_i % 100 == 0:
+                    for test_i in xrange(NUM_TEST_RUNS):
+                        result = test(agent, env)
+                        f.write("%03d\t%d\t%d\t%.3f\n" % (seed, train_i, test_i, result))
+
+                train(agent, env)
+
+            # Test for 100 episodes
+            for test_i in xrange(NUM_TEST_RUNS):
+                result = test(agent, env)
+                f.write("%d\t%d\t%d\t%.3f\n" % (seed, max_evaluations, test_i, result))
+
+            f.close()
