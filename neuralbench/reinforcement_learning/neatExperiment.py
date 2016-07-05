@@ -119,16 +119,17 @@ if __name__ == '__main__':
         params = random_initialization(seed = seed)
         num_generations = max_evaluations/params.PopulationSize + 1
         total_reward = 0
-        for env_name in datasets:
-            evolution_iterator = evolve(env_name, seed, params, num_generations, num_generations)
-            for generation, results in evolution_iterator:
-                result = sum(results)
-                if env_name == "Pendulum-v0":
-                    result /= 10
-                total_reward += result
+        for run in xrange(5):
+            for env_name in datasets:
+                evolution_iterator = evolve(env_name, seed, params, num_generations, num_generations)
+                for generation, results in evolution_iterator:
+                    result = sum(results)
+                    if env_name == "Pendulum-v0":
+                        result /= 10
+                    total_reward += result
 
-        f.write("%0.3f\t%d\t%d\t%s\n" % (-total_reward, num_generations * params.PopulationSize, seed, write_params(params)))
-        f.flush()
+            f.write("%0.3f\t%d\t%d\t%s\n" % (-total_reward, num_generations * params.PopulationSize, seed, write_params(params)))
+            f.flush()
 
     f.close()
 
