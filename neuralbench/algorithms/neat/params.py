@@ -328,7 +328,7 @@ def random_initialization(seed=None):
 
 
     # Percent of best individuals that are allowed to reproduce. 1.0 = 100%
-    params.SurvivalRate = round(random.random(), 2)
+    params.SurvivalRate = round(random.random()/2, 2)
 
     # Probability for a baby to result from sexual reproduction (crossover/mating). 1.0 = 100%
     params.CrossoverRate = round(random.random(), 2)  # mutate only 0.25
