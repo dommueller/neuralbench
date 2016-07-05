@@ -118,8 +118,8 @@ if __name__ == '__main__':
     for seed in trange(1000):
         params = random_initialization(seed = seed)
         num_generations = max_evaluations/params.PopulationSize + 1
-        total_reward = 0
         for run in xrange(5):
+            total_reward = 0
             for env_name in datasets:
                 evolution_iterator = evolve(env_name, seed, params, num_generations, num_generations)
                 for generation, results in evolution_iterator:
