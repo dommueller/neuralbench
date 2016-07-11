@@ -8,6 +8,8 @@ from pybrain.structure.modules import LinearLayer
 from pybrain.structure.modules import LSTMLayer
 from pybrain.optimization import SNES
 
+import neuralbench.algorithms.snes.core as snes_core
+
 def build_simple_network(input_size, network_size, output_size):
     return lambda: buildNetwork(input_size, network_size, output_size, hiddenclass=ReluLayer, outclass=LinearLayer, outputbias=True, recurrent=False)
 
@@ -32,96 +34,126 @@ def net_configuration(architecture, network_size, env_name):
         raise NameError('No Architecture with that name')
 
 
-
-
-def train_network(env_name, seed, step_limit, max_evaluations, f, build_network):
-    env = gym.make(env_name)
+def run_network(nn, env, episode_count=1):
     discrete_output = isinstance(env.action_space, gym.spaces.discrete.Discrete)
-    
-    def objF(params):
+
+    cumulated_reward = 0
+    episode_count = 1
+
+    for _ in xrange(episode_count):
+        ob = env.reset()
+
+        for _ in xrange(env.spec.timestep_limit):
+            result = nn.activate(np.reshape(ob, -1))
+
+            if discrete_output:
+                action = np.argmax(result)
+            else:
+                assert(len(result) % 2 == 0)
+                action = np.array([np.random.normal(result[i], abs(result[i+1])) for i in xrange(0, len(result), 2)])
+
+            ob, reward, done, _ = env.step(action)
+            cumulated_reward += reward
+
+            if done:
+                break
+
+    return cumulated_reward
+
+def configure_train_test(env_name, seed, build_network):
+    def train_network(params):
         nn = build_network()
-        nn._setParameters(np.array(params)) 
+        nn._setParameters(np.array(params))
 
         env = gym.make(env_name)
-        env.seed(l.numLearningSteps)
+        env.seed(snes_core.generation)
 
-        cum_reward = 0
-        episode_count = 1
+        result = run_network(nn, env)
+        env.close()
 
-        for _ in xrange(episode_count):
-            ob = env.reset()
+        return result
 
-            for _ in xrange(step_limit):
-                result = nn.activate(np.reshape(ob, -1))
-                
-                if discrete_output:
-                    action = np.argmax(result)
-                else:
-                    assert(len(result) % 2 == 0)
-                    action = np.array([np.random.normal(result[i], abs(result[i+1])) for i in xrange(0, len(result), 2)])
+    def test_network(params):
+        # print params
+        nn = build_network()
+        nn._setParameters(np.array(params))
 
-                ob, reward, done, _ = env.step(action)
-                cum_reward += reward
-                if done:
-                    break
+        env = gym.make(env_name)
+        env.seed(seed)
 
-            nn.reset()
+        results = [run_network(nn, env) for _ in xrange(100)]
+        env.close()
+        return results
 
-        return cum_reward
+    return train_network, test_network
 
-    # Set enviroment
-
-    # Build net for initial random params
+def evolve(env_name, seed, build_network, evaluations_per_generation_batch, max_batches):
+    train_network, test_network = configure_train_test(env_name, seed, build_network)
     n = build_network()
-    x0 = n.params
+    start_params = n.params
 
-    l = SNES(objF, x0, verbose=False)
-    l.minimize = False
-    num_generations = max_evaluations/l.batchSize + 1
-    l.maxEvaluations = num_generations * num_generations
+    run_snes, population_size = snes_core.configure_snes(train_network, start_params, minimize=False)
+    iterator = run_snes()
 
-    best = x0
-    for generation in xrange(num_generations):
-        result = l.learn(additionalLearningSteps=1)
-        best = result[0]
+    generations_per_batch = max(evaluations_per_generation_batch / population_size, 1)
 
-    
-    net = build_network()
-    net._setParameters(np.array(best)) 
-    for run in xrange(100):
-        cum_reward = 0
-        episode_count = 1
+    current_best = None
+    i = 0
 
-        for _ in xrange(episode_count):
-            ob = env.reset()
+    while i < max_batches * generations_per_batch:
+        for _ in xrange(generations_per_batch):
+            current_best = iterator.next()
+            i += 1
+            assert i == snes_core.generation
 
-            for _ in xrange(step_limit):
-                result = net.activate(np.reshape(ob, -1))
-
-                if discrete_output:
-                    action = np.argmax(result)
-                else:
-                    assert(len(result) % 2 == 0)
-                    action = np.array([np.random.normal(result[i], abs(result[i+1])) for i in xrange(0, len(result), 2)])
-
-                ob, reward, done, _ = env.step(action)
-                cum_reward += reward
-                if done:
-                    break
-
-            net.reset()
-
-        f.write("%03d\t%d\t%d\t%.3f\n" % (seed, (num_generations * l.batchSize), run, cum_reward)) 
+        results = test_network(current_best)
+        yield i * population_size, results
 
 
-def runExperiment(env_name, dataset, architecture, network_size, seed, step_limit, max_evaluations):
+def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations):
     np.random.seed(seed)
     file_name = "snes_%s_%d_%s_%03d.dat" % (architecture, network_size, dataset, seed)
     f = open(file_name, 'w')
     f.write("seed\tevaluations\trun\tresult\n")
 
+    num_batches = 100
+    evaluations_per_generation_batch = max_evaluations / num_batches
+
     # TODO run experiment
     build_network = net_configuration(architecture, network_size, env_name)
-    train_network(env_name, seed, step_limit, max_evaluations, f, build_network)
+
+    evolution_iterator = evolve(env_name, seed, build_network, evaluations_per_generation_batch, num_batches)
+    for evals, results in evolution_iterator:
+        for test_i, result in results:
+            f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
 
     f.close()
+
+
+if __name__ == '__main__':
+    import logging
+    from tqdm import *
+    gym.undo_logger_setup()
+    logger = logging.getLogger()
+    logger.setLevel(logging.ERROR)
+
+    datasets = ["CartPole-v0", "Acrobot-v0", "MountainCar-v0", "Pendulum-v0"]
+    evaluations_per_generation_batch = 5000
+
+    print "Starting parameter sweep for snes"
+
+    for seed in trange(1000):
+        for run in xrange(5):
+            total_reward = 0
+            for env_name in datasets:
+                build_network = net_configuration("simple", 10, env_name)
+                evolution_iterator = evolve(env_name, seed, build_network, evaluations_per_generation_batch, 5)
+                for generation, results in evolution_iterator:
+                    result = sum(results)
+                    if env_name == "Pendulum-v0":
+                        result /= 10
+                    total_reward += result
+
+            print seed, run, total_reward
+
+
