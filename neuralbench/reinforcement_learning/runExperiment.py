@@ -6,23 +6,23 @@ import argparse
 
 def createEnvironment(environment_name):
     if environment_name == "cartpole":
-        return "CartPole-v0", gym.envs.registry.spec("CartPole-v0").timestep_limit
+        return "CartPole-v0"
     elif environment_name == "acrobot":
-        return "Acrobot-v0", gym.envs.registry.spec("Acrobot-v0").timestep_limit
+        return "Acrobot-v0"
     elif environment_name == "mountaincar":
-        return "MountainCar-v0", gym.envs.registry.spec("MountainCar-v0").timestep_limit
+        return "MountainCar-v0"
     elif environment_name == "pendulum":
-        return "Pendulum-v0", gym.envs.registry.spec("Pendulum-v0").timestep_limit
+        return "Pendulum-v0"
     elif environment_name == "nchain":
         pass
-        # return "NChain-v0", gym.envs.registry.spec("NChain-v0").timestep_limit
+        # return "NChain-v0"
     elif environment_name == "blackjack":
         pass
-        # return "Blackjack-v0", gym.envs.registry.spec("Blackjack-v0").timestep_limit
+        # return "Blackjack-v0"
     elif environment_name == "go9":
-        return "Go9x9-v0", gym.envs.registry.spec("Go9x9-v0").timestep_limit
+        return "Go9x9-v0"
     elif environment_name == "go19":
-        return "Go19x19-v0", gym.envs.registry.spec("Go19x19-v0").timestep_limit
+        return "Go19x19-v0"
 
 
 if __name__ == '__main__':
@@ -48,26 +48,26 @@ if __name__ == '__main__':
     else:
         print "Training on %s using %s and seed is %d (max evaluations: %d)" % (args.dataset, args.algorithm, args.seed, args.evaluations)
 
-    env_name, step_limit = createEnvironment(args.dataset)
+    env_name = createEnvironment(args.dataset)
 
     if args.algorithm == "neat":
         import neatExperiment
-        neatExperiment.runExperiment(env_name, args.dataset, args.seed, step_limit, args.evaluations)
+        neatExperiment.runExperiment(env_name, args.dataset, args.seed, args.evaluations)
     elif args.algorithm == "hyperneat":
         import hyperNeatExperiment
         pass
     elif args.algorithm == "snes":
         import snesExperiment
-        snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
+        snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
     elif args.algorithm == "dqn":
         import dqn.dqnExperiment
         dqn.dqnExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
     elif args.algorithm == "cosyne":
         import cosyneExperiment
-        cosyneExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
+        cosyneExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
     elif args.algorithm == "leea":
         import leeaExperiment
-        leeaExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, step_limit, args.evaluations)
+        leeaExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
     else:
         print "Algorithm not found"
 

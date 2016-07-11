@@ -38,22 +38,30 @@ def run_network(genome, env, episode_count=1):
 
     return cumulated_reward
 
-def train_network(genome, generation=0):
-    env = gym.make(env_name)
-    env.seed(generation)
-    result = run_network(genome, env)
-    env.close()
-    return result
+def configure_train_test(env_name, seed):
+    def train_network(genome, generation=0):
+        env = gym.make(env_name)
+        env.seed(generation)
 
-def test_network(genome):
-    env = gym.make(env_name)
-    results = [run_network(genome, env) for _ in xrange(100)]
-    env.close()
-    return results
+        result = run_network(genome, env)
+        env.close()
+        return result
 
-def evolve(env_name, seed, params, num_generations, max_generations):
+    def test_network(genome):
+        env = gym.make(env_name)
+        env.seed(seed)
+
+        results = [run_network(genome, env) for _ in xrange(100)]
+        env.close()
+        return results
+
+    return train_network, test_network
+
+def evolve(env_name, seed, params, evaluations_per_generation_batch, max_batches):
     env = gym.make(env_name)
     discrete_output = isinstance(env.action_space, gym.spaces.discrete.Discrete)
+
+    train_network, test_network = configure_train_test(env_name, seed)
 
     if discrete_output:
         g = NEAT.Genome(0, len(np.reshape(env.observation_space.sample(), -1)), 0, env.action_space.n, False, 
@@ -69,19 +77,23 @@ def evolve(env_name, seed, params, num_generations, max_generations):
     run_neat = configure_neat(population, train_network)
     iterator = run_neat()
 
+    generations_per_batch = max(evaluations_per_generation_batch / params.PopulationSize, 1)
+
     current_best = None
     i = 0
-    while i < max_generations:
-        for _ in xrange(num_generations):
+
+    while i < max_batches * generations_per_batch:
+        for _ in xrange(generations_per_batch):
             generation, current_best = iterator.next()
             i += 1
+            assert i == generation
 
         best = pickle.loads(current_best)
         results = test_network(best)
-        yield i, results
+        yield i * params.PopulationSize, results
 
 
-def runExperiment(env_name, dataset, seed, step_limit, max_evaluations):
+def runExperiment(env_name, dataset, seed, max_evaluations):
     np.random.seed(seed)
     file_name = "neat_neat_%s_%03d.dat" % (dataset, seed)
     f = open(file_name, 'w')
@@ -89,13 +101,14 @@ def runExperiment(env_name, dataset, seed, step_limit, max_evaluations):
 
     params = standard_initialization()
     params.RecurrentProb = 0.4
-    NUM_TESTS = 100
-    num_generations = (max_evaluations/NUM_TESTS)/params.PopulationSize + 1
 
-    evolution_iterator = evolve(env_name, seed, params, num_generations, NUM_TESTS*num_generations)
-    for generation, results in evolution_iterator:
+    num_batches = 100
+    evaluations_per_generation_batch = max_evaluations / num_batches
+
+    evolution_iterator = evolve(env_name, seed, params, evaluations_per_generation_batch, num_batches)
+    for evals, results in evolution_iterator:
         for test_i, result in results:
-            f.write("%03d\t%d\t%d\t%.3f\n" % (seed, (generation * params.PopulationSize), test_i, result))
+            f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
 
     f.close()
 
@@ -122,7 +135,7 @@ if __name__ == '__main__':
             total_reward = 0
             for env_name in datasets:
                 evolution_iterator = evolve(env_name, seed, params, num_generations, num_generations)
-                for generation, results in evolution_iterator:
+                for evals, results in evolution_iterator:
                     result = sum(results)
                     if env_name == "Pendulum-v0":
                         result /= 10
