@@ -5,6 +5,15 @@ import random
 from collections import deque
 from dqn_params import DqnParams
 
+def standard_initialization():
+    params = DqnParams()
+    params.gamma = 0.9
+    params.initial_epsilon = 0.9
+    params.final_epsilon = 0.01
+    params.replay_size = 10000
+    params.batch_size = 32
+    return params
+
 class DQN():
     # DQN Agent inspired by: Flood Sung
     # https://gist.github.com/songrotek/3b9d893f1e0788f8fad0e6b49cde70f1#file-dqn-py
@@ -147,6 +156,14 @@ class DQN_continous(DQN):
         Q_value = self.Q_value.eval(feed_dict = {self.state_input:[state]})[0]
         return Q_value
 
+def create_agent(env_name, network_size, params, max_evaluations):
+    env = gym.make(env_name)
+    if "Pendulum" in env_name:
+        agent = DQN_continous(env, network_size, params, max_evaluations)
+    else:
+        agent = DQN(env, network_size, params, max_evaluations)
+    env.close()
+    return agent
 
 def test(agent, env):
     total_reward = 0
@@ -161,96 +178,90 @@ def test(agent, env):
 
     return total_reward
 
-def train(agent, env):
+def train(agent, env, num_train_iterations=None):
     state = env.reset()
     for _ in xrange(env.spec.timestep_limit):
         action = agent.egreedy_action(state)
         next_state,reward,done,_ = env.step(action)
         agent.perceive(state,action,reward,next_state,done)
         state = next_state
-        if done:
-            break
-    if len(agent.replay_buffer) > agent.hyperparameters.batch_size:
-        for _ in xrange(10):
+
+        if (num_train_iterations == None) and (len(agent.replay_buffer) > agent.hyperparameters.batch_size):
             agent.train_Q_network()
 
+        if done:
+            break
+
+    if (num_train_iterations != None) and (len(agent.replay_buffer) > agent.hyperparameters.batch_size):
+        for _ in xrange(num_train_iterations):
+            agent.train_Q_network()
+
+def train_test(env_name, seed, agent, evaluations_per_batch, max_batches, num_train_iterations=None):
+    env = gym.make(env_name)
+    
+    i = 0
+
+    while i < max_batches * evaluations_per_batch:
+        for _ in xrange(evaluations_per_batch):
+            i += 1
+            env.seed(i)
+            train(agent, env, num_train_iterations=num_train_iterations)
+
+        env.seed(seed)
+        results = [test(agent, env) for _ in xrange(100)]
+        yield i, results
+
 def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations):
-    params = DqnParams()
-    params.gamma = 0.9
-    params.initial_epsilon = 0.9
-    params.final_epsilon = 0.01
-    params.replay_size = 10000
-    params.batch_size = 32
-    NUM_TEST_RUNS = 100
+    params = standard_initialization()
 
     np.random.seed(seed)
     file_name = "dqn_%s_%d_%s_%03d.dat" % (architecture, network_size, dataset, seed)
     f = open(file_name, 'w')
     f.write("seed\tevaluations\trun\tresult\n")
 
-    env = gym.make(env_name)
-    if dataset == "pendulum":
-        agent = DQN_continous(env, network_size, params, max_evaluations)
-    else:
-        agent = DQN(env, network_size, params, max_evaluations)
+    agent = create_agent(env_name, network_size, params, max_evaluations)
+    num_batches = 100
+    evaluations_per_generation_batch = max_evaluations / num_batches
 
-    # Train for max_evaluations episodes
-    for train_i in xrange(max_evaluations):
-        if train_i % 100 == 0:
-            for test_i in xrange(NUM_TEST_RUNS):
-                result = test(agent, env)
-                f.write("%03d\t%d\t%d\t%.3f\n" % (seed, train_i, test_i, result))
-
-        train(agent, env)
-
-    # Test for 100 episodes
-    for test_i in xrange(NUM_TEST_RUNS):
-        result = test(agent, env)
-        f.write("%d\t%d\t%d\t%.3f\n" % (seed, max_evaluations, test_i, result))
+    train_test_iterator = train_test(env_name, seed, agent, evaluations_per_generation_batch, num_batches, num_train_iterations=200)
+    for evals, results in train_test_iterator:
+        for test_i, result in enumerate(results):
+            f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
+        f.flush()
 
     f.close()
 
+
 if __name__ == '__main__':
     import logging
+    from tqdm import *
     gym.undo_logger_setup()
     logger = logging.getLogger()
     logger.setLevel(logging.ERROR)
-    import sys
-    seed = int(sys.argv[1])
 
     datasets = ["CartPole-v0", "Acrobot-v0", "MountainCar-v0", "Pendulum-v0"]
-    params = DqnParams()
-    params.random_initialization(seed = seed)
-    max_evaluations = 20000
-    NUM_TEST_RUNS = 100
+    evaluations_per_generation_batch = 5000
 
-    for env_name in datasets:
-        for network_size in [40]:
-            step_limit = gym.envs.registry.spec(env_name).timestep_limit
-            dataset_name = env_name.split("-")[0].lower()
-            file_identifier = "params_dqn_%s_%d_%s_%03d-%s" % (architecture, network_size, dataset_name, seed, str(params).replace("\t", "_"))
-            print "Starting parameter sweep for dqn %s" % file_identifier
-            file_name = "%s.dat" % (file_identifier)
-            f = open(file_name, 'w')
-            f.write("seed\tevaluations\trun\tresult\n")
-            env = gym.make(env_name)
-            if dataset == "pendulum":
-                agent = DQN_continous(env, network_size, params, max_evaluations)
-            else:
-                agent = DQN(env, network_size, params, max_evaluations)
+    print "Starting parameter sweep for dqn"
 
-            # Train for max_evaluations episodes
-            for train_i in xrange(max_evaluations):
-                if train_i % 100 == 0:
-                    for test_i in xrange(NUM_TEST_RUNS):
-                        result = test(agent, env)
-                        f.write("%03d\t%d\t%d\t%.3f\n" % (seed, train_i, test_i, result))
+    for seed in trange(1000):
+        params = DqnParams()
+        params.random_initialization(seed = seed)
 
-                train(agent, env)
+        for run in xrange(5):
+            total_reward = 0
+            for env_name in datasets:
+                agent = create_agent(env_name, 10, params, max_evaluations)
+                evolution_iterator = train_test(env_name, seed, agent, evaluations_per_generation_batch, 1, num_train_iterations=200)
+                for generation, results in evolution_iterator:
+                    result = sum(results)
+                    if env_name == "Pendulum-v0":
+                        result /= 10
+                    total_reward += result
 
-            # Test for 100 episodes
-            for test_i in xrange(NUM_TEST_RUNS):
-                result = test(agent, env)
-                f.write("%d\t%d\t%d\t%.3f\n" % (seed, max_evaluations, test_i, result))
+            print seed, run, total_reward
 
-            f.close()
+
+
+
+
