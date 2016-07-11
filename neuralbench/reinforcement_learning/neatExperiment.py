@@ -57,7 +57,7 @@ def configure_train_test(env_name, seed):
 
     return train_network, test_network
 
-def evolve(env_name, seed, params, evaluations_per_generation_batch, max_batches):
+def evolve(env_name, seed, params, max_evaluations, num_batches):
     env = gym.make(env_name)
     discrete_output = isinstance(env.action_space, gym.spaces.discrete.Discrete)
 
@@ -77,12 +77,12 @@ def evolve(env_name, seed, params, evaluations_per_generation_batch, max_batches
     run_neat = configure_neat(population, train_network)
     iterator = run_neat()
 
-    generations_per_batch = max(evaluations_per_generation_batch / params.PopulationSize, 1)
+    generations_per_batch = max((max_evaluations / num_batches) / params.PopulationSize, 1)
 
     current_best = None
     i = 0
 
-    while i < max_batches * generations_per_batch:
+    while i * params.PopulationSize < max_evaluations:
         for _ in xrange(generations_per_batch):
             generation, current_best = iterator.next()
             i += 1
@@ -115,9 +115,7 @@ def runExperiment(env_name, dataset, seed, max_evaluations, num_batches):
     params.MutateWeightsProb = 0.05
     params.WeightMutationRate = 0.93
 
-    evaluations_per_generation_batch = max_evaluations / num_batches
-
-    evolution_iterator = evolve(env_name, seed, params, evaluations_per_generation_batch, num_batches)
+    evolution_iterator = evolve(env_name, seed, params, max_evaluations, num_batches)
     for evals, results in evolution_iterator:
         for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
@@ -144,11 +142,10 @@ if __name__ == '__main__':
 
     for seed in trange(1000):
         params = random_initialization(seed = seed)
-        num_generations = max_evaluations/params.PopulationSize + 1
         for run in xrange(5):
             total_reward = 0
             for env_name in datasets:
-                evolution_iterator = evolve(env_name, seed, params, num_generations, num_generations)
+                evolution_iterator = evolve(env_name, seed, params, max_evaluations, 1)
                 for evals, results in evolution_iterator:
                     result = sum(results)
                     if env_name == "Pendulum-v0":

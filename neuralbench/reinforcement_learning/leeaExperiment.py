@@ -89,7 +89,7 @@ def configure_train_test(env_name, build_network):
 
     return train_network, test_network
 
-def evolve(env_name, seed, params, build_network, evaluations_per_generation_batch, max_batches):
+def evolve(env_name, seed, params, build_network, max_evaluations, max_batches):
     train_network, test_network = configure_train_test(env_name, build_network)
 
     population = leea_core.initialize_population(build_network, train_network, test_network, params)
@@ -97,12 +97,12 @@ def evolve(env_name, seed, params, build_network, evaluations_per_generation_bat
     run_leea = leea_core.configure_leea(population, train_network, params)
     iterator = run_leea()
 
-    generations_per_batch = max(evaluations_per_generation_batch / params.population_size, 1)
+    generations_per_batch = max((max_evaluations / num_batches) / params.population_size, 1)
 
     current_best = None
     i = 0
 
-    while i < max_batches * generations_per_batch:
+    while i * params.population_size < max_evaluations:
         for _ in xrange(generations_per_batch):
             generation, current_best = iterator.next()
             i += 1
@@ -136,12 +136,9 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     f = open(file_name, 'w')
     f.write("seed\tevaluations\trun\tresult\n")
 
-
-    evaluations_per_generation_batch = max_evaluations / num_batches
-
     build_network = net_configuration(architecture, network_size, env_name)
 
-    evolution_iterator = evolve(env_name, seed, params, build_network, evaluations_per_generation_batch, num_batches)
+    evolution_iterator = evolve(env_name, seed, params, build_network, max_evaluations, num_batches)
     for evals, results in evolution_iterator:
         for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
@@ -162,7 +159,7 @@ if __name__ == '__main__':
     datasets = ["CartPole-v0", "Acrobot-v0", "MountainCar-v0", "Pendulum-v0"]
     params = LeeaParams()
     params.random_initialization(seed = seed)
-    evaluations_per_generation_batch = 5000
+    max_evaluations = 5000
 
     print "Starting parameter sweep for leea"
 
@@ -171,7 +168,7 @@ if __name__ == '__main__':
             total_reward = 0
             for env_name in datasets:
                 build_network = net_configuration("simple", 10, env_name)
-                evolution_iterator = evolve(env_name, seed, params, build_network, evaluations_per_generation_batch, 5)
+                evolution_iterator = evolve(env_name, seed, params, build_network, max_evaluations, 1)
                 for generation, results in evolution_iterator:
                     result = sum(results)
                     if env_name == "Pendulum-v0":
