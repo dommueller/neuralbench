@@ -52,22 +52,22 @@ if __name__ == '__main__':
 
     if args.algorithm == "neat":
         import neatExperiment
-        neatExperiment.runExperiment(env_name, args.dataset, args.seed, args.evaluations)
+        neatExperiment.runExperiment(env_name, args.dataset, args.seed, args.evaluations, 20)
     elif args.algorithm == "hyperneat":
         import hyperNeatExperiment
         pass
     elif args.algorithm == "snes":
         import snesExperiment
-        snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
+        snesExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations, 20)
     elif args.algorithm == "dqn":
         import dqn.dqnExperiment
-        dqn.dqnExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
+        dqn.dqnExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations, 20)
     elif args.algorithm == "cosyne":
         import cosyneExperiment
-        cosyneExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
+        cosyneExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations, 20)
     elif args.algorithm == "leea":
         import leeaExperiment
-        leeaExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations)
+        leeaExperiment.runExperiment(env_name, args.dataset, args.architecture, args.network_size, args.seed, args.evaluations, 20)
     else:
         print "Algorithm not found"
 

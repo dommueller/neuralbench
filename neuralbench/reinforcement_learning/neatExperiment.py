@@ -93,7 +93,7 @@ def evolve(env_name, seed, params, evaluations_per_generation_batch, max_batches
         yield i * params.PopulationSize, results
 
 
-def runExperiment(env_name, dataset, seed, max_evaluations):
+def runExperiment(env_name, dataset, seed, max_evaluations, num_batches):
     np.random.seed(seed)
     file_name = "neat_neat_%s_%03d.dat" % (dataset, seed)
     f = open(file_name, 'w')
@@ -115,7 +115,6 @@ def runExperiment(env_name, dataset, seed, max_evaluations):
     params.MutateWeightsProb = 0.05
     params.WeightMutationRate = 0.93
 
-    num_batches = 100
     evaluations_per_generation_batch = max_evaluations / num_batches
 
     evolution_iterator = evolve(env_name, seed, params, evaluations_per_generation_batch, num_batches)

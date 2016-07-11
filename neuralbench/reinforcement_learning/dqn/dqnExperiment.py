@@ -211,7 +211,7 @@ def train_test(env_name, seed, agent, evaluations_per_batch, max_batches, num_tr
         results = [test(agent, env) for _ in xrange(100)]
         yield i, results
 
-def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations):
+def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations, num_batches):
     params = standard_initialization()
 
     np.random.seed(seed)
@@ -220,7 +220,6 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     f.write("seed\tevaluations\trun\tresult\n")
 
     agent = create_agent(env_name, network_size, params, max_evaluations)
-    num_batches = 100
     evaluations_per_generation_batch = max_evaluations / num_batches
 
     train_test_iterator = train_test(env_name, seed, agent, evaluations_per_generation_batch, num_batches, num_train_iterations=None)

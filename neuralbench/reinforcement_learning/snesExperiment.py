@@ -113,13 +113,12 @@ def evolve(env_name, seed, build_network, evaluations_per_generation_batch, max_
         yield i * population_size, results
 
 
-def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations):
+def runExperiment(env_name, dataset, architecture, network_size, seed, max_evaluations, num_batches):
     np.random.seed(seed)
     file_name = "snes_%s_%d_%s_%03d.dat" % (architecture, network_size, dataset, seed)
     f = open(file_name, 'w')
     f.write("seed\tevaluations\trun\tresult\n")
 
-    num_batches = 100
     evaluations_per_generation_batch = max_evaluations / num_batches
 
     build_network = net_configuration(architecture, network_size, env_name)
