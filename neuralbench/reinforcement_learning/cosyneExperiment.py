@@ -66,9 +66,9 @@ def run_network(nn, env, episode_count=1):
     return cumulated_reward
 
 def configure_train_test(env_name, build_network):
-    def train_network(individium, seed):
+    def train_network(individual, seed):
         nn = build_network()
-        nn._setParameters(np.array(individium))
+        nn._setParameters(np.array(individual))
 
         env = gym.make(env_name)
         env.seed(seed)
@@ -78,9 +78,9 @@ def configure_train_test(env_name, build_network):
 
         return result
 
-    def test_network(individium, seed):
+    def test_network(individual, seed):
         nn = build_network()
-        nn._setParameters(np.array(individium))
+        nn._setParameters(np.array(individual))
 
         env = gym.make(env_name)
         env.seed(seed)

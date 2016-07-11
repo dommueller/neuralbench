@@ -55,7 +55,7 @@ def train_network(env_name, step_limit, max_evaluations, build_network, params):
 
     best = None
     for generation in xrange(num_generations):
-        results = np.array([run_network(individium, current_seed=generation) for individium in population])
+        results = np.array([run_network(individual, current_seed=generation) for individual in population])
         sort_idx = np.argsort(results)[::-1]
         sorted_pop = population[sort_idx]
         sorted_results = results[sort_idx]

@@ -59,7 +59,7 @@ def configure_cosyne(population, train, params, validate = None):
         while True:
             generation += 1
 
-            results = np.array([train(individium, generation) for individium in new_population])
+            results = np.array([train(individual, generation) for individual in new_population])
             sort_idx = np.argsort(results)[::-1]
             sorted_pop = new_population[sort_idx]
             sorted_results = results[sort_idx]
@@ -67,7 +67,7 @@ def configure_cosyne(population, train, params, validate = None):
             new_population = create_new_generation(sorted_pop, sorted_results, params)
 
             if validate != None:
-                validation_results = np.array([validate(individium, generation) for individium in new_population])
+                validation_results = np.array([validate(individual, generation) for individual in new_population])
                 current_best = np.array(new_population[np.argmax(validation_results)], copy=True)
             
             yield generation, current_best
