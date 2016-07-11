@@ -4,8 +4,6 @@ from pybrain.structure.modules import LinearLayer
 from pybrain.structure.modules import LSTMLayer
 from pybrain.optimization import SNES
 
-print __name__
-
 def configure_snes(objF, start_params, minimize=False):
     l = SNES(objF, start_params, verbose=False)
     l.minimize = minimize

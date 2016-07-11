@@ -201,6 +201,8 @@ def train_test(env_name, seed, agent, max_evaluations, max_batches, num_train_it
     
     i = 0
 
+    evaluations_per_batch = max_evaluations / max_batches
+
     while i < max_evaluations:
         for _ in xrange(evaluations_per_batch):
             i += 1
