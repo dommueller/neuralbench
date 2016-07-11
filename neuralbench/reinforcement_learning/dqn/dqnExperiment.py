@@ -223,7 +223,7 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     num_batches = 100
     evaluations_per_generation_batch = max_evaluations / num_batches
 
-    train_test_iterator = train_test(env_name, seed, agent, evaluations_per_generation_batch, num_batches, num_train_iterations=200)
+    train_test_iterator = train_test(env_name, seed, agent, evaluations_per_generation_batch, num_batches, num_train_iterations=None)
     for evals, results in train_test_iterator:
         for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
