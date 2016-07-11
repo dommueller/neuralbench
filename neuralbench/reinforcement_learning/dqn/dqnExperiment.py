@@ -227,6 +227,7 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     for evals, results in train_test_iterator:
         for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
+
         f.flush()
 
     f.close()

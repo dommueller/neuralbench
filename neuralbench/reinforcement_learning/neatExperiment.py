@@ -110,6 +110,8 @@ def runExperiment(env_name, dataset, seed, max_evaluations):
         for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
 
+        f.flush()
+
     f.close()
 
 if __name__ == '__main__':

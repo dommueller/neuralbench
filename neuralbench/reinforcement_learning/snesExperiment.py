@@ -50,13 +50,16 @@ def run_network(nn, env, episode_count=1):
                 action = np.argmax(result)
             else:
                 assert(len(result) % 2 == 0)
-                action = np.array([np.random.normal(result[i], abs(result[i+1])) for i in xrange(0, len(result), 2)])
+                action = np.array([np.random.normal(result[i], abs(result[i+1]))
+                                    if result[i+1] != 0 else result[i] for i in xrange(0, len(result), 2)])
 
             ob, reward, done, _ = env.step(action)
             cumulated_reward += reward
 
             if done:
                 break
+
+        nn.reset()
 
     return cumulated_reward
 
@@ -119,13 +122,14 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
     num_batches = 100
     evaluations_per_generation_batch = max_evaluations / num_batches
 
-    # TODO run experiment
     build_network = net_configuration(architecture, network_size, env_name)
 
     evolution_iterator = evolve(env_name, seed, build_network, evaluations_per_generation_batch, num_batches)
     for evals, results in evolution_iterator:
         for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
+
+        f.flush()
 
     f.close()
 
