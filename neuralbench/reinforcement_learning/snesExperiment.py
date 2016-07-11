@@ -124,7 +124,7 @@ def runExperiment(env_name, dataset, architecture, network_size, seed, max_evalu
 
     evolution_iterator = evolve(env_name, seed, build_network, evaluations_per_generation_batch, num_batches)
     for evals, results in evolution_iterator:
-        for test_i, result in results:
+        for test_i, result in enumerate(results):
             f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
 
     f.close()
