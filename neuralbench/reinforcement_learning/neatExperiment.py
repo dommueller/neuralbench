@@ -102,6 +102,19 @@ def runExperiment(env_name, dataset, seed, max_evaluations):
     params = standard_initialization()
     params.RecurrentProb = 0.4
 
+    params.PopulationSize = 150
+    params.MinSpecies = 5
+    params.MaxSpecies = 16
+    params.SurvivalRate = 0.35
+    params.CrossoverRate = 0.73
+    params.OverallMutationRate = 0.43
+    params.MultipointCrossoverRate = 0.80
+    params.MutateAddNeuronProb = 0.53
+    params.MutateAddLinkProb = 0.08
+    params.RecurrentProb = 0.46
+    params.MutateWeightsProb = 0.05
+    params.WeightMutationRate = 0.93
+
     num_batches = 100
     evaluations_per_generation_batch = max_evaluations / num_batches
 
