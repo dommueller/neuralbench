@@ -89,7 +89,7 @@ def configure_train_test(env_name, build_network):
 
     return train_network, test_network
 
-def evolve(env_name, seed, params, build_network, max_evaluations, max_batches):
+def evolve(env_name, seed, params, build_network, max_evaluations, num_batches):
     train_network, test_network = configure_train_test(env_name, build_network)
 
     population = leea_core.initialize_population(build_network, train_network, test_network, params)

@@ -196,12 +196,12 @@ def train(agent, env, num_train_iterations=None):
         for _ in xrange(num_train_iterations):
             agent.train_Q_network()
 
-def train_test(env_name, seed, agent, max_evaluations, max_batches, num_train_iterations=None):
+def train_test(env_name, seed, agent, max_evaluations, num_batches, num_train_iterations=None):
     env = gym.make(env_name)
     
     i = 0
 
-    evaluations_per_batch = max_evaluations / max_batches
+    evaluations_per_batch = max_evaluations / num_batches
 
     while i < max_evaluations:
         for _ in xrange(evaluations_per_batch):
