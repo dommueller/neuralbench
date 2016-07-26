@@ -4,82 +4,25 @@ import numpy as np
 import MultiNEAT as NEAT
 import pickle
 
-params = NEAT.Parameters()
-params.PopulationSize = 300
-# params.DynamicCompatibility = True
-# params.WeightDiffCoeff = 4.0
-# params.CompatTreshold = 2.0
-# params.YoungAgeTreshold = 15
-# params.SpeciesMaxStagnation = 15
-# params.OldAgeTreshold = 35
-# params.MinSpecies = 5
-# params.MaxSpecies = 10
-# params.RouletteWheelSelection = False
-# params.RecurrentProb = 0.4
-# params.OverallMutationRate = 0.8
+from neuralbench.algorithms.neat.params import standard_initialization, write_params_header, write_params
 
-# params.MutateWeightsProb = 0.90
+params = standard_initialization()
 
-# params.WeightMutationMaxPower = 2.5
-# params.WeightReplacementMaxPower = 5.0
-# params.MutateWeightsSevereProb = 0.5
-# params.WeightMutationRate = 0.25
-
-# params.MaxWeight = 8
-
-# params.MutateAddNeuronProb = 0.03
-# params.MutateAddLinkProb = 0.05
-# params.MutateRemLinkProb = 0.0
-
-# params.MinActivationA  = 4.9
-# params.MaxActivationA  = 4.9
-
-# params.ActivationFunction_SignedSigmoid_Prob = 1.0
-# # params.ActivationFunction_UnsignedSigmoid_Prob = 0.0
-# params.ActivationFunction_Tanh_Prob = 1.0
-# # params.ActivationFunction_TanhCubic_Prob = 0.0
-# params.ActivationFunction_SignedStep_Prob = 1.0
-# # params.ActivationFunction_UnsignedStep_Prob = 0.0
-# params.ActivationFunction_SignedGauss_Prob = 1.0
-# # params.ActivationFunction_UnsignedGauss_Prob = 0.0
-# params.ActivationFunction_Abs_Prob = 1.0
-# params.ActivationFunction_SignedSine_Prob = 1.0
-# # params.ActivationFunction_UnsignedSine_Prob = 0.0
-# params.ActivationFunction_Linear_Prob = 1.0
-# params.ActivationFunction_Relu_Prob = 1.0
-# # params.ActivationFunction_Softplus_Prob = 0.0
-
-def set_activation_functions(tanh):
-    if tanh:
-        params.ActivationFunction_SignedSigmoid_Prob = 0.0
-        params.ActivationFunction_UnsignedSigmoid_Prob = 0.0
-        params.ActivationFunction_Tanh_Prob = 1.0
-        params.ActivationFunction_TanhCubic_Prob = 0.0
-        params.ActivationFunction_SignedStep_Prob = 0.0
-        params.ActivationFunction_UnsignedStep_Prob = 0.0
-        params.ActivationFunction_SignedGauss_Prob = 0.0
-        params.ActivationFunction_UnsignedGauss_Prob = 0.0
-        params.ActivationFunction_Abs_Prob = 0.0
-        params.ActivationFunction_SignedSine_Prob = 0.0
-        params.ActivationFunction_UnsignedSine_Prob = 0.0
-        params.ActivationFunction_Linear_Prob = 0.0
-        params.ActivationFunction_Relu_Prob = 0.0
-        params.ActivationFunction_Softplus_Prob = 0.0
-    else:
-        params.ActivationFunction_SignedSigmoid_Prob = 1.0
-        params.ActivationFunction_UnsignedSigmoid_Prob = 0.0
-        params.ActivationFunction_Tanh_Prob = 1.0
-        params.ActivationFunction_TanhCubic_Prob = 0.0
-        params.ActivationFunction_SignedStep_Prob = 1.0
-        params.ActivationFunction_UnsignedStep_Prob = 0.0
-        params.ActivationFunction_SignedGauss_Prob = 1.0
-        params.ActivationFunction_UnsignedGauss_Prob = 0.0
-        params.ActivationFunction_Abs_Prob = 1.0
-        params.ActivationFunction_SignedSine_Prob = 1.0
-        params.ActivationFunction_UnsignedSine_Prob = 0.0
-        params.ActivationFunction_Linear_Prob = 1.0
-        params.ActivationFunction_Relu_Prob = 1.0
-        params.ActivationFunction_Softplus_Prob = 0.0
+def set_activation_functions():
+    params.ActivationFunction_SignedSigmoid_Prob = 0.0
+    params.ActivationFunction_UnsignedSigmoid_Prob = 0.0
+    params.ActivationFunction_Tanh_Prob = 1.0
+    params.ActivationFunction_TanhCubic_Prob = 0.0
+    params.ActivationFunction_SignedStep_Prob = 0.0
+    params.ActivationFunction_UnsignedStep_Prob = 0.0
+    params.ActivationFunction_SignedGauss_Prob = 0.0
+    params.ActivationFunction_UnsignedGauss_Prob = 0.0
+    params.ActivationFunction_Abs_Prob = 0.0
+    params.ActivationFunction_SignedSine_Prob = 0.0
+    params.ActivationFunction_UnsignedSine_Prob = 0.0
+    params.ActivationFunction_Linear_Prob = 0.0
+    params.ActivationFunction_Relu_Prob = 0.0
+    params.ActivationFunction_Softplus_Prob = 0.0
 
 def testNetwork(data, n_classes, genome, evals, file, seed):
     genome = pickle.loads(genome)
@@ -248,7 +191,7 @@ def runExperiment(dataset, seed, max_evaluations, num_samples, tanh=False):
     f.write("seed\ttest_split\tvalidation_split")
     f.write("\tevaluation_data\tevaluations\tfitness_type\tresult\n")
 
-    set_activation_functions(tanh)
+    if tanh: set_activation_functions()
 
     if dataset["name"] == "mnist":
         train_network = configure_for_training(num_samples, max_evaluations, 10, seed, f)
@@ -258,5 +201,98 @@ def runExperiment(dataset, seed, max_evaluations, num_samples, tanh=False):
         run_validate_splits(train_network, dataset["X_train"], dataset["y_train"], dataset["X_test"], dataset["y_test"], folds=10, seed=seed)
 
     f.close()
+
+
+if __name__ == '__main__':
+    import sys
+    import random
+    from tqdm import *
+
+    from sklearn.cross_validation import StratifiedShuffleSplit
+    from sklearn.cross_validation import StratifiedKFold
+
+    from neuralbench.classification.dataset.create import createDataSet
+    from neuralbench.algorithms.neat.params import random_initialization
+    from sklearn.metrics import log_loss, accuracy_score
+
+    dataset_name = "mnist"
+
+    max_evaluations = 50000
+
+    file_identifier = "params_neat"
+    print "Starting parameter sweep for neat"
+    file_name = "%s.dat" % (file_identifier)
+    f = open(file_name, 'w')
+    f.write("result\tevaluations\tseed\t%s\n" % (write_params_header()))
+
+    def run_network(genome, cur_data, cur_label):
+        net = NEAT.NeuralNetwork()
+        genome.BuildPhenotype(net)
+
+        results = []
+        for example in cur_data:
+            net.Flush()
+            net.Input(example)
+            for _ in range(3):
+                net.Activate()
+
+            result = softmax(net.Output())
+            results.append(result)
+
+        predictions = [np.argmax(result) for result in results]
+
+        acc = accuracy_score(cur_label, predictions)
+        cost = log_loss(cur_label, results)
+        return acc, cost
+
+    X_train, y_train, _, _ = createDataSet(dataset_name)
+    for samples in [10, 20, 30, 40, 50, 100]:
+        for seed in xrange(1000):
+            params = random_initialization(seed = seed)
+
+            skf_test = StratifiedKFold(y_train.reshape(-1), n_folds=3, shuffle=True)
+            for i, (train_validate_index, test_index) in tqdm(enumerate(skf_test)):
+                X_train_validate = X_train[train_validate_index]
+                y_train_validate = y_train[train_validate_index]
+                X_test = X_train[test_index]
+                y_test = y_train[test_index]
+                skf_validate = StratifiedKFold(y_train_validate.reshape(-1), n_folds=5, shuffle=True)
+                for j, (train_index, validate_index) in tqdm(enumerate(skf_validate)):
+                    X_train = X_train_validate[train_index]
+                    y_train = y_train_validate[train_index]
+                    X_validate = X_train_validate[validate_index]
+                    y_validate = y_train_validate[validate_index]
+
+                    g = NEAT.Genome(0, 28*28, 0, 10, False, 
+                        NEAT.ActivationFunction.LINEAR, NEAT.ActivationFunction.TANH, 0, params)
+                    population = NEAT.Population(g, params, True, 1.0, seed)
+                    population.RNG.Seed(seed)
+
+                    evaluations_per_generation = params.PopulationSize * samples
+                    num_generations = max_evaluations / evaluations_per_generation
+
+                    sss = StratifiedShuffleSplit(y_train.reshape(-1), num_generations, train_size=samples, random_state=seed)
+                    for generation, (batch_index, _) in tqdm(enumerate(sss)):
+                        train_results = []
+                        for genome in NEAT.GetGenomeList(population):
+                            acc, cost = run_network(genome, X_train[batch_index], y_train[batch_index])
+                            train_results.append([acc, cost])
+                            genome.SetFitness(-cost)
+
+                        population.Epoch()
+
+                    validate_results = []
+                    for genome in NEAT.GetGenomeList(population):
+                        acc, cost = run_network(genome, X_validate, y_validate)
+                        validate_results.append([acc, cost])
+                        genome.SetFitness(-cost)
+
+                    best = population.GetBestGenome()
+                    acc, cost = run_network(best, X_test, y_test)
+
+                    f.write("%0.2f\t%d\t%d\t%s\n" % (acc, num_generations * evaluations_per_generation, seed, write_params(params)))
+                    f.flush()
+
+        f.close()
 
 
