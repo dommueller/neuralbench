@@ -245,17 +245,17 @@ if __name__ == '__main__':
         cost = log_loss(cur_label, results)
         return acc, cost
 
-    X_train, y_train, _, _ = createDataSet(dataset_name)
+    full_X_train, full_y_train, _, _ = createDataSet(dataset_name)
     for samples in [10, 20, 30, 40, 50, 100]:
         for seed in xrange(1000):
             params = random_initialization(seed = seed)
 
-            skf_test = StratifiedKFold(y_train.reshape(-1), n_folds=3, shuffle=True)
+            skf_test = StratifiedKFold(full_y_train.reshape(-1), n_folds=3, shuffle=True)
             for i, (train_validate_index, test_index) in tqdm(enumerate(skf_test)):
-                X_train_validate = X_train[train_validate_index]
-                y_train_validate = y_train[train_validate_index]
-                X_test = X_train[test_index]
-                y_test = y_train[test_index]
+                X_train_validate = full_X_train[train_validate_index]
+                y_train_validate = full_y_train[train_validate_index]
+                X_test = full_X_train[test_index]
+                y_test = full_y_train[test_index]
                 skf_validate = StratifiedKFold(y_train_validate.reshape(-1), n_folds=5, shuffle=True)
                 for j, (train_index, validate_index) in tqdm(enumerate(skf_validate)):
                     X_train = X_train_validate[train_index]
