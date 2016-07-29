@@ -32,7 +32,8 @@ class DQN():
         self.create_training_method()
 
         # Init session
-        self.session = tf.InteractiveSession()
+        NUM_THREADS = 4
+        self.session = tf.InteractiveSession(config=tf.ConfigProto(intra_op_parallelism_threads=NUM_THREADS))
         self.session.run(tf.initialize_all_variables())
 
     def create_Q_network(self, net_size):
