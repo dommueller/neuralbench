@@ -49,7 +49,7 @@ if __name__=="__main__":
     _, _, X_test, y_test = createDataSet("mnist")
 
     f = open("random.weights."+ case[0] + "." + str(seed), 'w')
-    shape = buildNet_perceptron_mnist().params.shape
+    shape = case[1]().params.shape
     for _ in xrange(10000):
         params = np.random.uniform(-4, 4, shape)
         testNetwork(X_test, y_test, params, case[1], f)
