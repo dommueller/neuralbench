@@ -57,6 +57,11 @@ def configure_train_test(env_name, seed):
 
     return train_network, test_network
 
+def network_size(genome):
+    net = NEAT.NeuralNetwork()
+    genome.BuildPhenotype(net)
+    return len(net.neurons), len(net.connections)
+
 def evolve(env_name, seed, params, max_evaluations, num_batches):
     env = gym.make(env_name)
     discrete_output = isinstance(env.action_space, gym.spaces.discrete.Discrete)
@@ -90,14 +95,15 @@ def evolve(env_name, seed, params, max_evaluations, num_batches):
 
         best = pickle.loads(current_best)
         results = test_network(best)
-        yield i * params.PopulationSize, results
+        neurons, connections = network_size(best)
+        yield i * params.PopulationSize, results, neurons, connections
 
 
 def runExperiment(env_name, dataset, seed, max_evaluations, num_batches):
     np.random.seed(seed)
     file_name = "neat_neat_%s_%03d.dat" % (dataset, seed)
     f = open(file_name, 'w')
-    f.write("seed\tevaluations\trun\tresult\n")
+    f.write("seed\tevaluations\trun\tresult\tneurons\tconnections\n")
 
     params = standard_initialization()
     params.RecurrentProb = 0.4
@@ -116,9 +122,9 @@ def runExperiment(env_name, dataset, seed, max_evaluations, num_batches):
     params.WeightMutationRate = 0.93
 
     evolution_iterator = evolve(env_name, seed, params, max_evaluations, num_batches)
-    for evals, results in evolution_iterator:
+    for evals, results, neurons, connections in evolution_iterator:
         for test_i, result in enumerate(results):
-            f.write("%03d\t%d\t%d\t%.3f\n" % (seed, evals, test_i, result))
+            f.write("%03d\t%d\t%d\t%.3f\t%d\t%d\n" % (seed, evals, test_i, result, neurons, connections))
 
         f.flush()
 
