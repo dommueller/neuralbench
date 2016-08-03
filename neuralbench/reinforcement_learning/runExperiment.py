@@ -2,6 +2,7 @@
 
 import logging
 import gym
+import ranch
 import argparse
 
 def createEnvironment(environment_name):
@@ -13,6 +14,16 @@ def createEnvironment(environment_name):
         return "MountainCar-v0"
     elif environment_name == "pendulum":
         return "Pendulum-v0"
+    elif environment_name == "bandit20":
+        return "TwentyArmedBandit-v0"
+    elif environment_name == "banditregret20":
+        return "TwentyArmedBanditRegret-v0"
+    elif environment_name == "banditlate20":
+        return "TwentyArmedBanditLateReward-v0"
+    elif environment_name == "banditregretlate20":
+        return "TwentyArmedBanditRegretLate-v0"
+    elif environment_name == "mnist":
+        return "MNIST-v0"
     elif environment_name == "nchain":
         pass
         # return "NChain-v0"
@@ -32,7 +43,7 @@ if __name__ == '__main__':
 
 
     algorithms = ["neat", "hyperneat", "snes", "dqn", "cosyne", "leea"]
-    datasets = ["cartpole", "acrobot", "mountaincar", "pendulum", "nchain", "blackjack", "go9", "go19"]
+    datasets = ["cartpole", "acrobot", "mountaincar", "pendulum", "bandit20", "banditregret20", "banditlate20", "banditregretlate20", "mnist"]
     architectures = ["simple", "recurrent"]
 
     parser = argparse.ArgumentParser()
