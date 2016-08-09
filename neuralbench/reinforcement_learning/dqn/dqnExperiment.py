@@ -24,7 +24,7 @@ class DQN():
         self.replay_buffer = deque()
         # init some parameters
         self.epsilon = self.hyperparameters.initial_epsilon
-        self.state_dim = env.observation_space.shape[0]
+        self.state_dim = len(np.reshape(env.observation_space.sample(), -1))
         self.action_dim = env.action_space.n 
 
         tf.reset_default_graph()
@@ -32,9 +32,9 @@ class DQN():
         self.create_training_method()
 
         # Init session
-        # NUM_THREADS = 4
-        # self.session = tf.InteractiveSession(config=tf.ConfigProto(intra_op_parallelism_threads=NUM_THREADS, inter_op_parallelism_threads=NUM_THREADS))
-        self.session = tf.InteractiveSession()
+        NUM_THREADS = 4
+        self.session = tf.InteractiveSession(config=tf.ConfigProto(intra_op_parallelism_threads=NUM_THREADS, inter_op_parallelism_threads=NUM_THREADS))
+        # self.session = tf.InteractiveSession()
         self.session.run(tf.initialize_all_variables())
 
     def create_Q_network(self, net_size):
@@ -58,6 +58,8 @@ class DQN():
         self.optimizer = tf.train.AdamOptimizer(0.0001).minimize(self.cost)
 
     def perceive(self,state,action,reward,next_state,done):
+        state = np.reshape(state, -1)
+        next_state = np.reshape(next_state, -1)
         one_hot_action = np.zeros(self.action_dim)
         one_hot_action[action] = 1
         self.replay_buffer.append((state,one_hot_action,reward,next_state,done))
@@ -92,6 +94,7 @@ class DQN():
             })
 
     def egreedy_action(self,state):
+        state = np.reshape(state, -1)
         Q_value = self.Q_value.eval(feed_dict = {
             self.state_input:[state]
             })[0]
@@ -131,12 +134,14 @@ class DQN_continous(DQN):
         self.create_training_method()
 
         # Init session
-        # NUM_THREADS = 4
-        # self.session = tf.InteractiveSession(config=tf.ConfigProto(intra_op_parallelism_threads=NUM_THREADS, inter_op_parallelism_threads=NUM_THREADS))
-        self.session = tf.InteractiveSession()
+        NUM_THREADS = 4
+        self.session = tf.InteractiveSession(config=tf.ConfigProto(intra_op_parallelism_threads=NUM_THREADS, inter_op_parallelism_threads=NUM_THREADS))
+        # self.session = tf.InteractiveSession()
         self.session.run(tf.initialize_all_variables())
 
     def perceive(self,state,action,reward,next_state,done):
+        state = np.reshape(state, -1)
+        next_state = np.reshape(next_state, -1)
         self.replay_buffer.append((state,action,reward,next_state,done))
         if len(self.replay_buffer) > self.hyperparameters.replay_size:
             self.replay_buffer.popleft()
@@ -145,6 +150,7 @@ class DQN_continous(DQN):
         #     self.train_Q_network()
 
     def egreedy_action(self,state):
+        state = np.reshape(state, -1)
         Q_value = self.Q_value.eval(feed_dict = {
             self.state_input:[state]
             })[0]
