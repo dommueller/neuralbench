@@ -107,6 +107,7 @@ class DQN():
         return action
 
     def action(self,state):
+        state = np.reshape(state, -1)
         return np.argmax(self.Q_value.eval(feed_dict = {
             self.state_input:[state]
             })[0])
@@ -163,6 +164,7 @@ class DQN_continous(DQN):
         return action
 
     def action(self,state):
+        state = np.reshape(state, -1)
         Q_value = self.Q_value.eval(feed_dict = {self.state_input:[state]})[0]
         return Q_value
 
