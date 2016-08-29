@@ -53,6 +53,7 @@ def testNetwork(data, n_classes, genome, evals, file, seed):
     file.write("neat %d %d %f\n" % (seed, evals, acc))
 
 def softmax(w, t = 1.0):
+    w -= np.max(w)
     e = np.exp(np.array(w) / t)
     dist = e / np.sum(e)
     return dist
@@ -128,21 +129,31 @@ def configure_for_training(batch_size, max_evaluations, n_classes, seed, f):
         def run_network(genome, cur_data, cur_label):
             net = NEAT.NeuralNetwork()
             genome.BuildPhenotype(net)
+            try:
+                actual_results = []
+                results = []
+                for example in cur_data:
+                    net.Flush()
+                    net.Input(example)
+                    for _ in range(3):
+                        net.Activate()
 
-            results = []
-            for example in cur_data:
-                net.Flush()
-                net.Input(example)
-                for _ in range(3):
-                    net.Activate()
+                    actual_result = net.Output()
+                    result = softmax(actual_result)
+                    # print "NEW"
+                    # for element in actual_result:
+                    #     print element
+                    # print result
+                    actual_results.append([actual_result[0], actual_result[1]])
+                    results.append(result)
 
-                result = softmax(net.Output())
-                results.append(result)
+                predictions = [np.argmax(result) for result in results]
 
-            predictions = [np.argmax(result) for result in results]
-
-            acc = accuracy_score(cur_label, predictions)
-            cost = log_loss(cur_label, results)
+                acc = accuracy_score(cur_label, predictions)
+                cost = log_loss(cur_label, results)
+            except:
+                print actual_results
+                print results
             return acc, cost
 
         # Used to sample a batch with same class ratios

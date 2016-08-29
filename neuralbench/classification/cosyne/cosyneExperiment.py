@@ -60,7 +60,7 @@ def createNewPop(old_pop, results, params):
         # parents = np.random.choice(len(elite), 2, replace=False, p=softmax(-np.array(results[0:top_idx])))
         # Substract max, so that lowest will have highest prob
         # new_results = np.array(results[0:top_idx]) - (results[-1] + 1)
-        new_results = 1.0 / results[0:top_idx]
+        new_results = 1.0 / (results[0:top_idx] + 1)
         probs = new_results / sum(new_results)
         parents = np.random.choice(len(elite), 2, replace=False, p=probs)
         child1, child2 = uniform_crossover(elite[parents[0]], elite[parents[1]])
@@ -190,20 +190,20 @@ def configure_for_training(params, max_evaluations, n_classes, eval_genotype, nu
 
                 pop = createNewPop(sorted_pop, sorted_results, params)
 
-            validate_results = np.array([[acc, cost] for acc, cost in [eval_genotype(sess, chromosome, X_validate, y_validate) for chromosome in pop]])
-            best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
-            acc, cost = eval_genotype(sess, pop[best_validation_acc_index], X_test, y_test)
+                validate_results = np.array([[acc, cost] for acc, cost in [eval_genotype(sess, chromosome, X_validate, y_validate) for chromosome in pop]])
+                best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
+                acc, cost = eval_genotype(sess, pop[best_validation_acc_index], X_test, y_test)
 
-            train_evaluations = (generation) * evaluations_per_generation
+                train_evaluations = (generation) * evaluations_per_generation
 
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "cost", np.min(validate_results, axis=0)[1]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "cost", cost))
-            # if generation % 100 == 0:
-            f.flush()
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "cost", np.min(validate_results, axis=0)[1]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "cost", cost))
+                # if generation % 100 == 0:
+                f.flush()
 
     return train_network
 

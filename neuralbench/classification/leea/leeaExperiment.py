@@ -119,14 +119,14 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
         pop = initialize_population(params.population_size, weights_template, params.initial_weight_range, eval_net)
 
         with tf.Session() as sess:
-            # validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
-            # best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
-            # acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
+            validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
+            best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
+            acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
 
-            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "acc", np.max(validate_results, axis=0)[0]))
-            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "acc", acc))
-            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "cost", np.min(validate_results, axis=0)[1]))
-            # f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "cost", cost))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "acc", np.max(validate_results, axis=0)[0]))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "acc", acc))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", 0, "cost", np.min(validate_results, axis=0)[1]))
+            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", 0, "cost", cost))
 
             evaluations_per_generation = params.population_size * params.batch_size
             num_generations = max_evaluations/(evaluations_per_generation) + 1
@@ -149,20 +149,20 @@ def configure_for_training(params, max_evaluations, n_classes, eval_net, weights
                 pop = sort_population(pop)
                 pop = create_new_population(params, pop[:elite_size])
 
-            validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
-            best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
-            acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
-            
-            train_evaluations = (generation) * evaluations_per_generation
+                validate_results = np.array([[acc, cost] for acc, cost in [individual.evaluate(X_validate, y_validate, sess) for individual in pop]])
+                best_validation_acc_index = np.argmax(validate_results, axis=0)[0]
+                acc, cost = pop[best_validation_acc_index].evaluate(X_test, y_test, sess)
+                
+                train_evaluations = (generation) * evaluations_per_generation
 
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "cost", np.min(validate_results, axis=0)[1]))
-            f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "cost", cost))
-            # if generation % 100 == 0:
-            f.flush()
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "acc", np.max(train_results, axis=0)[0]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "acc", np.max(validate_results, axis=0)[0]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "acc", acc))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "train", train_evaluations, "cost", np.min(train_results, axis=0)[1]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "val", train_evaluations, "cost", np.min(validate_results, axis=0)[1]))
+                f.write("%s\t%s\t%s\t%d\t%s\t%f\n" % (file_start, params, "test", train_evaluations, "cost", cost))
+                # if generation % 100 == 0:
+                f.flush()
 
     return train_network
 
