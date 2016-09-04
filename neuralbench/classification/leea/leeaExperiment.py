@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 
 import leeaNetworks
-from leea_params import LeeaParams
+from neuralbench.algorithms.leea.leea_params import LeeaParams
 from neuralbench.classification.dataset.create import dense_to_one_hot
 
 class Gene(object):

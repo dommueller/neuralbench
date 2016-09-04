@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 import cosyneNetworks
-from cosyne_params import CosyneParams
+from neuralbench.algorithms.cosyne.cosyne_params import CosyneParams
 
 
 # Taken from 
